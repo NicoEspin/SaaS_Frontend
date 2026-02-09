@@ -1,0 +1,80 @@
+{
+  "Nav": {
+    "brand": "Stock",
+    "dashboard": "Dashboard",
+    "inventory": "Inventory",
+    "products": "Products",
+    "reports": "Reports",
+    "settings": "Settings",
+    "openSettings": "Open settings",
+    "collapseSidebar": "Collapse sidebar",
+    "expandSidebar": "Expand sidebar",
+    "themeToDark": "Switch to dark mode",
+    "themeToLight": "Switch to light mode"
+  },
+  "Pages": {
+    "dashboardTitle": "Dashboard",
+    "dashboardSubtitle": "Overview and quick actions.",
+    "inventoryTitle": "Inventory",
+    "inventorySubtitle": "Manage stock levels and locations.",
+    "productsTitle": "Products",
+    "productsSubtitle": "Create and update your catalog.",
+    "reportsTitle": "Reports",
+    "reportsSubtitle": "Track KPIs and exports.",
+    "settingsTitle": "Settings",
+    "settingsSubtitle": "Personalize your workspace."
+  },
+  "Dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Overview of sales, orders, and stock health.",
+    "range": "Range",
+    "range30d": "Last 30 days",
+    "ctaExport": "Export",
+    "legendRevenue": "Revenue",
+    "legendOrders": "Orders",
+    "kpis": {
+      "revenue": "Revenue",
+      "orders": "Orders",
+      "onTime": "On-time",
+      "alerts": "Alerts",
+      "onTimeValue": "{value}%",
+      "deltaUp": "+{value}",
+      "deltaDown": "-{value}"
+    },
+    "cards": {
+      "salesTitle": "Sales pulse",
+      "salesDesc": "Revenue vs orders this week.",
+      "stockTitle": "Stock health",
+      "stockDesc": "Availability split across SKUs.",
+      "topTitle": "Top products",
+      "topDesc": "Fast movers by units shipped.",
+      "activityTitle": "Recent activity",
+      "activityDesc": "Latest operational signals."
+    },
+    "stock": {
+      "in": "In stock",
+      "low": "Low stock",
+      "out": "Out of stock"
+    },
+    "days": {
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat",
+      "sun": "Sun"
+    },
+    "tooltip": {
+      "unknown": "Unknown",
+      "items": "{value} items",
+      "units": "{value} units"
+    },
+    "activity": {
+      "restock": "Restock received (SKU-3312)",
+      "lowStock": "Low stock alert (SKU-0841)",
+      "export": "Report exported",
+      "meta": "{value} ago"
+    }
+  }
+}

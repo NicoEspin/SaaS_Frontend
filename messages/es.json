@@ -1,0 +1,80 @@
+{
+  "Nav": {
+    "brand": "Stock",
+    "dashboard": "Dashboard",
+    "inventory": "Inventario",
+    "products": "Productos",
+    "reports": "Reportes",
+    "settings": "Configuracion",
+    "openSettings": "Abrir configuracion",
+    "collapseSidebar": "Colapsar sidebar",
+    "expandSidebar": "Expandir sidebar",
+    "themeToDark": "Cambiar a modo oscuro",
+    "themeToLight": "Cambiar a modo claro"
+  },
+  "Pages": {
+    "dashboardTitle": "Dashboard",
+    "dashboardSubtitle": "Resumen y acciones rapidas.",
+    "inventoryTitle": "Inventario",
+    "inventorySubtitle": "Gestiona stock y ubicaciones.",
+    "productsTitle": "Productos",
+    "productsSubtitle": "Crea y actualiza tu catalogo.",
+    "reportsTitle": "Reportes",
+    "reportsSubtitle": "Revisa KPIs y exportaciones.",
+    "settingsTitle": "Configuracion",
+    "settingsSubtitle": "Personaliza tu espacio de trabajo."
+  },
+  "Dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Resumen de ventas, pedidos y salud de stock.",
+    "range": "Rango",
+    "range30d": "Ultimos 30 dias",
+    "ctaExport": "Exportar",
+    "legendRevenue": "Ingresos",
+    "legendOrders": "Pedidos",
+    "kpis": {
+      "revenue": "Ingresos",
+      "orders": "Pedidos",
+      "onTime": "A tiempo",
+      "alerts": "Alertas",
+      "onTimeValue": "{value}%",
+      "deltaUp": "+{value}",
+      "deltaDown": "-{value}"
+    },
+    "cards": {
+      "salesTitle": "Pulso de ventas",
+      "salesDesc": "Ingresos vs pedidos esta semana.",
+      "stockTitle": "Salud de stock",
+      "stockDesc": "Disponibilidad por SKU.",
+      "topTitle": "Top productos",
+      "topDesc": "Mas vendidos por unidades.",
+      "activityTitle": "Actividad reciente",
+      "activityDesc": "Ultimas senales operativas."
+    },
+    "stock": {
+      "in": "En stock",
+      "low": "Stock bajo",
+      "out": "Sin stock"
+    },
+    "days": {
+      "mon": "Lun",
+      "tue": "Mar",
+      "wed": "Mie",
+      "thu": "Jue",
+      "fri": "Vie",
+      "sat": "Sab",
+      "sun": "Dom"
+    },
+    "tooltip": {
+      "unknown": "Desconocido",
+      "items": "{value} items",
+      "units": "{value} uds"
+    },
+    "activity": {
+      "restock": "Reposicion recibida (SKU-3312)",
+      "lowStock": "Alerta de stock bajo (SKU-0841)",
+      "export": "Reporte exportado",
+      "meta": "hace {value}"
+    }
+  }
+}
