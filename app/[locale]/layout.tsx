@@ -6,7 +6,6 @@ import { getMessages, setRequestLocale } from "next-intl/server";
 
 import "../globals.css";
 
-import AppWrapper from "@/components/layout/AppWrapper";
 import ThemeClassSync from "@/components/theme/ThemeClassSync";
 import { isLocale, locales } from "@/i18n/locales";
 
@@ -46,7 +45,7 @@ export default async function LocaleLayout({ children, params }: Props) {
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <NextIntlClientProvider messages={messages}>
           <ThemeClassSync />
-          <AppWrapper>{children}</AppWrapper>
+          {children}
         </NextIntlClientProvider>
       </body>
     </html>

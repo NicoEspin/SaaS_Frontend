@@ -3,6 +3,7 @@
 This is the Next.js frontend (App Router). Follow these rules strictly.
 
 ## Commands (required before finishing)
+
 - Dev: `npm dev`
 - Build: `npm build`
 - Lint: `npm lint`
@@ -10,15 +11,17 @@ This is the Next.js frontend (App Router). Follow these rules strictly.
 - Tests (if present): `npm test`
 
 Definition of Done:
-1) No TypeScript errors (must pass `npm typecheck`)
-2) No ESLint errors (must pass `npm lint`)
-3) UI matches design intent, responsive, accessible
-4) Uses design tokens (CSS variables) — no hardcoded theme colors
-5) All user-facing text is translated via `next-intl` (no hardcoded strings)
+
+1. No TypeScript errors (must pass `npm typecheck`)
+2. No ESLint errors (must pass `npm lint`)
+3. UI matches design intent, responsive, accessible
+4. Uses design tokens (CSS variables) — no hardcoded theme colors
+5. All user-facing text is translated via `next-intl` (no hardcoded strings)
 
 ---
 
 ## Tech constraints
+
 - Next.js (App Router)
 - TypeScript (strict mindset: no `any`)
 - TailwindCSS
@@ -32,6 +35,7 @@ Do NOT introduce new UI libraries without explicit instruction.
 ## Internationalization (MANDATORY) — next-intl
 
 ### Hard rules
+
 - All user-facing strings must come from `next-intl`:
   - Use `useTranslations()` in Client Components
   - Use `getTranslations()` (or server-friendly usage) in Server Components
@@ -40,11 +44,13 @@ Do NOT introduce new UI libraries without explicit instruction.
   - `Nav.*`, `Auth.*`, `Common.*`, `Errors.*`, `Forms.*`, `Dashboard.*`, etc.
 
 ### Locale strategy
+
 - Use a locale segment strategy (recommended): `app/[locale]/...`
 - Keep routing and links locale-aware.
 - Provide a default locale and supported locales list in a single source of truth.
 
 ### Translation files
+
 - Store dictionaries in a predictable structure (example):
   - `messages/en.json`
   - `messages/es.json`
@@ -52,6 +58,7 @@ Do NOT introduce new UI libraries without explicit instruction.
 - When adding new UI, always add keys in all supported locales in the same PR.
 
 ### Type-safety
+
 - Prefer typed message keys where possible (e.g., generated types or strict key conventions).
 - Do not cast translation results to force types. Fix the source.
 
@@ -60,22 +67,27 @@ Do NOT introduce new UI libraries without explicit instruction.
 ## Design system & theming (MANDATORY)
 
 ### Primary brand color
+
 Primary brand is a deep navy, based on Tailwind `blue-900` (#1e3a8a), BUT:
 
 ✅ Use semantic tokens:
+
 - `bg-primary`, `text-primary-foreground`, `border-border`, `bg-background`, etc.
 - Tokens must map to CSS variables (`--primary`, `--background`, etc.)
 - Dark/Light mode must be switchable by swapping variables (e.g. `.dark` class)
 
 ❌ Never hardcode:
+
 - `bg-blue-900`, `text-blue-900`, `#1e3a8a` directly in components
-(only allowed in token definitions)
+  (only allowed in token definitions)
 
 ### How to implement tokens
+
 - Define tokens in `app/globals.css` (or equivalent) using `:root` and `.dark`
 - Tailwind config must map colors to `hsl(var(--token))` (shadcn convention)
 
 ### UI decisions
+
 - Use shadcn primitives (Button, Card, Dialog, Sheet, DropdownMenu, Tabs, Table, etc.)
 - For variants, prefer `cva` patterns already used by shadcn components
 - Use `cn()` helper for className composition (no manual string chaos)
@@ -85,6 +97,7 @@ Primary brand is a deep navy, based on Tailwind `blue-900` (#1e3a8a), BUT:
 ## TypeScript rules (ZERO type issues)
 
 ### Hard rules
+
 - No `any`, no `unknown` without narrowing, no `as SomeType` unless justified
 - Props must be typed (explicit types or inferred from generics)
 - Prefer:
@@ -94,20 +107,24 @@ Primary brand is a deep navy, based on Tailwind `blue-900` (#1e3a8a), BUT:
   - `satisfies` for object literals to keep inference correct
 
 ### Data boundaries
+
 Any data coming from:
+
 - Route Handlers
 - External APIs
 - localStorage/sessionStorage
 - searchParams
-Must be validated/normalized at the boundary (Zod recommended), then typed downstream.
+  Must be validated/normalized at the boundary (Zod recommended), then typed downstream.
 
 If a component consumes API data:
+
 - create a typed adapter (normalize shape once)
 - never scatter optional chaining everywhere to “fix” types
 
 ---
 
 ## Next.js best practices (App Router)
+
 - Default to Server Components; add `'use client'` only when needed.
 - Avoid putting client hooks (useState/useEffect) in Server Components.
 - Keep data fetching on the server when possible.
@@ -118,6 +135,7 @@ If a component consumes API data:
 ---
 
 ## Accessibility & UX (required)
+
 - All interactive elements must be keyboard accessible
 - Visible focus states (don’t remove outlines unless replaced properly)
 - Forms: proper labels, aria attributes where relevant
@@ -126,6 +144,7 @@ If a component consumes API data:
 ---
 
 ## Folder expectations (typical)
+
 - `app/` routes + layouts
 - `app/[locale]/` locale segment routes (recommended)
 - `components/` shared components
@@ -136,6 +155,7 @@ If a component consumes API data:
 ---
 
 ## Skills usage (when to use them)
+
 OpenCode skills are available. Use them deliberately:
 
 - Use `next-best-practices` whenever you:
@@ -148,5 +168,10 @@ OpenCode skills are available. Use them deliberately:
   - refine layout, spacing, typography
   - define a reusable pattern (forms, dashboards, tables, empty states)
   - need consistent light/dark theme decisions
+- Use `zustand-state-management` whenever you:
+  - add shared **client-side** state across components (filters, UI preferences, multi-step flows)
+  - need `persist` / `devtools` / slices pattern
+  - troubleshoot Next.js hydration mismatch, TS middleware typing, or infinite re-render loops
+  - need hydration-safe localStorage usage (App Router)
 
 If design system docs exist (e.g. `design-system/MASTER.md`), treat them as source of truth.

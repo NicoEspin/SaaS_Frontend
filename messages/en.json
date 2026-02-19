@@ -7,10 +7,83 @@
     "reports": "Reports",
     "settings": "Settings",
     "openSettings": "Open settings",
+    "logout": "Log out",
     "collapseSidebar": "Collapse sidebar",
     "expandSidebar": "Expand sidebar",
     "themeToDark": "Switch to dark mode",
     "themeToLight": "Switch to light mode"
+  },
+  "Auth": {
+    "common": {
+      "actions": {
+        "loading": "Loading..."
+      },
+      "errors": {
+        "generic": "Something went wrong. Please try again."
+      },
+      "validation": {
+        "invalidEmail": "Enter a valid email address.",
+        "passwordMin": "Password must be at least {min} characters."
+      }
+    },
+    "fields": {
+      "tenantName": "Workspace name",
+      "tenantSlug": "Workspace slug",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm password"
+    },
+    "login": {
+      "title": "Sign in",
+      "subtitle": "Access your workspace.",
+      "actions": {
+        "submit": "Sign in",
+        "noAccount": "No account yet?",
+        "goRegister": "Create one"
+      },
+      "validation": {
+        "tenantRequired": "Workspace slug is required."
+      },
+      "errors": {
+        "invalidCredentials": "Invalid credentials.",
+        "sessionExpired": "Session expired. Please sign in again."
+      }
+    },
+    "register": {
+      "title": "Create admin credentials",
+      "subtitle": "This step only saves data locally. You will create the workspace next.",
+      "actions": {
+        "continue": "Continue",
+        "haveAccount": "Already have an account?",
+        "goLogin": "Sign in"
+      },
+      "validation": {
+        "passwordsMismatch": "Passwords do not match."
+      }
+    },
+    "onboarding": {
+      "title": "Create your workspace",
+      "subtitle": "Set up your tenant and admin user.",
+      "sections": {
+        "tenant": "Workspace",
+        "admin": "Admin"
+      },
+      "hints": {
+        "slug": "Use only lowercase letters, numbers, and hyphens."
+      },
+      "actions": {
+        "submit": "Create workspace",
+        "backToLogin": "Back to login"
+      },
+      "validation": {
+        "tenantNameRequired": "Workspace name is required.",
+        "tenantSlugRequired": "Workspace slug is required.",
+        "tenantSlugInvalid": "Workspace slug can only contain letters, numbers, and hyphens."
+      },
+      "errors": {
+        "conflict": "That slug or email is already in use."
+      }
+    }
   },
   "Pages": {
     "dashboardTitle": "Dashboard",

@@ -1,10 +1,18 @@
 "use client";
 
-import { Moon, PanelLeftClose, PanelLeftOpen, Settings, Sun } from "lucide-react";
+import {
+  LogOut,
+  Moon,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Settings,
+  Sun,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import { Link, useRouter } from "@/i18n/navigation";
+import { useAuthStore } from "@/stores/auth-store";
 import { useThemeStore } from "@/stores/theme-store";
 
 type Props = {
@@ -15,6 +23,7 @@ type Props = {
 export default function Navbar({ sidebarCollapsed, onToggleSidebar }: Props) {
   const t = useTranslations("Nav");
   const router = useRouter();
+  const logout = useAuthStore((s) => s.logout);
   const mode = useThemeStore((s) => s.mode);
   const toggleMode = useThemeStore((s) => s.toggleMode);
 
@@ -78,6 +87,16 @@ export default function Navbar({ sidebarCollapsed, onToggleSidebar }: Props) {
             onClick={() => router.push("/settings")}
           >
             <Settings className="h-4 w-4" />
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={t("logout")}
+            onClick={() => logout({ reason: "manual" })}
+            className="border border-transparent hover:border-border"
+          >
+            <LogOut className="h-4 w-4" />
           </Button>
         </div>
       </div>

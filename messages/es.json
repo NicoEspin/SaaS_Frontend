@@ -7,10 +7,83 @@
     "reports": "Reportes",
     "settings": "Configuracion",
     "openSettings": "Abrir configuracion",
+    "logout": "Cerrar sesion",
     "collapseSidebar": "Colapsar sidebar",
     "expandSidebar": "Expandir sidebar",
     "themeToDark": "Cambiar a modo oscuro",
     "themeToLight": "Cambiar a modo claro"
+  },
+  "Auth": {
+    "common": {
+      "actions": {
+        "loading": "Cargando..."
+      },
+      "errors": {
+        "generic": "Algo salio mal. Intenta de nuevo."
+      },
+      "validation": {
+        "invalidEmail": "Ingresa un email valido.",
+        "passwordMin": "La password debe tener al menos {min} caracteres."
+      }
+    },
+    "fields": {
+      "tenantName": "Nombre del espacio",
+      "tenantSlug": "Slug del espacio",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirmar password"
+    },
+    "login": {
+      "title": "Iniciar sesion",
+      "subtitle": "Accede a tu espacio.",
+      "actions": {
+        "submit": "Ingresar",
+        "noAccount": "No tenes cuenta?",
+        "goRegister": "Crear una"
+      },
+      "validation": {
+        "tenantRequired": "El slug del espacio es obligatorio."
+      },
+      "errors": {
+        "invalidCredentials": "Credenciales invalidas.",
+        "sessionExpired": "Sesion expirada. Inicia sesion de nuevo."
+      }
+    },
+    "register": {
+      "title": "Crear credenciales de admin",
+      "subtitle": "Este paso solo guarda datos localmente. Luego creas el espacio.",
+      "actions": {
+        "continue": "Continuar",
+        "haveAccount": "Ya tenes cuenta?",
+        "goLogin": "Iniciar sesion"
+      },
+      "validation": {
+        "passwordsMismatch": "Las passwords no coinciden."
+      }
+    },
+    "onboarding": {
+      "title": "Crear tu espacio",
+      "subtitle": "Configura tu tenant y el usuario admin.",
+      "sections": {
+        "tenant": "Espacio",
+        "admin": "Admin"
+      },
+      "hints": {
+        "slug": "Usa solo minusculas, numeros y guiones."
+      },
+      "actions": {
+        "submit": "Crear espacio",
+        "backToLogin": "Volver al login"
+      },
+      "validation": {
+        "tenantNameRequired": "El nombre del espacio es obligatorio.",
+        "tenantSlugRequired": "El slug del espacio es obligatorio.",
+        "tenantSlugInvalid": "El slug solo puede contener letras, numeros y guiones."
+      },
+      "errors": {
+        "conflict": "Ese slug o email ya existe."
+      }
+    }
   },
   "Pages": {
     "dashboardTitle": "Dashboard",
