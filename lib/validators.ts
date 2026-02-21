@@ -14,3 +14,7 @@ export function normalizeTenantSlug(value: string) {
 export function isValidTenantSlug(value: string) {
   return /^[a-z0-9-]+$/.test(normalizeTenantSlug(value));
 }
+
+export function isValidAttributeKey(value: string) {
+  return /^[a-z0-9_]+$/.test(value.trim());
+}

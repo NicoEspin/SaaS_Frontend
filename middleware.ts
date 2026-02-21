@@ -9,6 +9,7 @@ const intlMiddleware = createMiddleware(routing);
 
 const PUBLIC_SEGMENTS = new Set(["login", "register", "onboarding"]);
 const ACCESS_TOKEN_COOKIE = "accessToken";
+const REFRESH_TOKEN_COOKIE = "refreshToken";
 
 function getLocaleFromPathname(pathname: string) {
   const maybeLocale = pathname.split("/")[1] ?? "";
@@ -27,7 +28,9 @@ export default function middleware(req: NextRequest) {
 
   const locale = getLocaleFromPathname(pathname);
   if (locale) {
-    const hasToken = Boolean(req.cookies.get(ACCESS_TOKEN_COOKIE)?.value);
+    const hasToken =
+      Boolean(req.cookies.get(ACCESS_TOKEN_COOKIE)?.value) ||
+      Boolean(req.cookies.get(REFRESH_TOKEN_COOKIE)?.value);
     const publicPath = isPublicPathname(pathname);
 
     if (!hasToken && !publicPath) {

@@ -150,4 +150,206 @@
       "meta": "hace {value}"
     }
   }
+  ,
+  "Common": {
+    "actions": {
+      "apply": "Aplicar",
+      "reset": "Resetear",
+      "create": "Crear",
+      "save": "Guardar",
+      "confirm": "Confirmar",
+      "cancel": "Cancelar",
+      "close": "Cerrar",
+      "refresh": "Refrescar",
+      "add": "Agregar",
+      "edit": "Editar",
+      "loading": "Cargando..."
+    },
+    "labels": {
+      "all": "Todos",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "yes": "Si",
+      "no": "No",
+      "none": "Sin",
+      "actions": "Acciones",
+      "select": "Seleccionar"
+    },
+    "errors": {
+      "generic": "Algo salio mal. Intenta de nuevo."
+    }
+  },
+  "Products": {
+    "actions": {
+      "new": "Nuevo producto",
+      "import": "Importar",
+      "export": "Exportar",
+      "manageAttributes": "Atributos",
+      "edit": "Editar",
+      "delete": "Eliminar"
+    },
+    "filters": {
+      "title": "Filtros",
+      "q": "Busqueda",
+      "qPlaceholder": "SKU, nombre o atributo...",
+      "code": "Codigo",
+      "codePlaceholder": "Ej: SKU-001",
+      "name": "Nombre",
+      "namePlaceholder": "Ej: Remera",
+      "categoryId": "Categoria ID",
+      "categoryIdPlaceholder": "ULID (opcional)",
+      "categoryName": "Categoria",
+      "categoryNamePlaceholder": "Nombre de categoria",
+      "isActive": "Estado"
+    },
+    "fields": {
+      "code": "Codigo",
+      "name": "Nombre",
+      "category": "Categoria",
+      "categoryId": "Categoria ID",
+      "description": "Descripcion",
+      "isActive": "Activo",
+      "updatedAt": "Actualizado",
+      "attributes": "Atributos"
+    },
+    "table": {
+      "title": "Productos",
+      "count": "{count} items",
+      "empty": "No hay productos con estos filtros."
+    },
+    "pagination": {
+      "loadMore": "Cargar mas",
+      "moreAvailable": "Hay mas resultados.",
+      "end": "Fin de resultados."
+    },
+    "form": {
+      "createTitle": "Crear producto",
+      "createSubtitle": "Completa los datos y guarda.",
+      "editTitle": "Editar producto",
+      "editSubtitle": "Actualiza los datos y guarda.",
+      "categoryIdHint": "ULID de categoria (opcional)",
+      "descriptionPlaceholder": "Notas internas o detalles...",
+      "attributesTitle": "Atributos dinamicos",
+      "attributesSubtitle": "Se cargan segun la categoria.",
+      "attributesNoCategory": "Selecciona una categoria para ver atributos.",
+      "attributesEmpty": "No hay definiciones para esta categoria."
+    },
+    "validation": {
+      "codeRequired": "El codigo es obligatorio.",
+      "nameRequired": "El nombre es obligatorio.",
+      "attributeRequired": "Este atributo es obligatorio."
+    },
+    "errors": {
+      "codeConflict": "Ese codigo ya existe."
+    },
+    "delete": {
+      "title": "Eliminar producto",
+      "description": "Vas a eliminar {name} ({code}). Esta accion no se puede deshacer.",
+      "confirm": "Eliminar"
+    }
+  },
+  "Attributes": {
+    "title": "Definiciones de atributos",
+    "subtitle": "Crea y administra atributos dinamicos por categoria.",
+    "categoryId": "Categoria ID",
+    "categoryIdPlaceholder": "ULID de categoria",
+    "fields": {
+      "key": "Key",
+      "label": "Etiqueta",
+      "type": "Tipo",
+      "options": "Opciones",
+      "unit": "Unidad",
+      "required": "Requerido",
+      "visibleInTable": "Visible en tabla",
+      "sortOrder": "Orden"
+    },
+    "empty": "Sin definiciones.",
+    "keyPlaceholder": "Ej: color",
+    "keyHint": "Formato: a-z, 0-9 y _",
+    "optionsPlaceholder": "Una opcion por linea o separadas por coma",
+    "optionsHint": "Requerido solo para ENUM.",
+    "unitPlaceholder": "Ej: cm, kg",
+    "editor": {
+      "create": "Nueva definicion",
+      "edit": "Editar definicion",
+      "new": "Nueva"
+    },
+    "types": {
+      "TEXT": "Texto",
+      "NUMBER": "Numero",
+      "BOOLEAN": "Booleano",
+      "DATE": "Fecha",
+      "ENUM": "Lista"
+    },
+    "actions": {
+      "delete": "Eliminar"
+    },
+    "errors": {
+      "categoryRequired": "Categoria ID es obligatoria.",
+      "invalidKey": "La key no es valida.",
+      "labelRequired": "La etiqueta es obligatoria.",
+      "sortOrderInvalid": "Orden invalido.",
+      "enumOptionsRequired": "ENUM requiere opciones."
+    },
+    "delete": {
+      "title": "Eliminar definicion",
+      "description": "Vas a eliminar {label} ({key}).",
+      "confirm": "Eliminar"
+    }
+  },
+  "ImportExport": {
+    "import": {
+      "title": "Importar productos",
+      "subtitle": "Subi un CSV o XLSX, revisa la vista previa y confirma.",
+      "file": "Archivo",
+      "fileHint": "Formato .csv o .xlsx",
+      "mode": "Modo",
+      "modes": {
+        "create": "Crear",
+        "update": "Actualizar",
+        "upsert": "Crear o actualizar"
+      },
+      "preview": "Vista previa",
+      "confirm": "Confirmar importacion",
+      "expired": "La vista previa expiro o no existe. Volve a generar la vista previa.",
+      "summaryTitle": "Resumen",
+      "summary": {
+        "totalRows": "Filas",
+        "validRows": "Validas",
+        "invalidRows": "Invalidas",
+        "willCreate": "Creara",
+        "willUpdate": "Actualizara"
+      },
+      "errorsTitle": "Errores",
+      "errors": {
+        "row": "Fila",
+        "column": "Columna",
+        "message": "Mensaje"
+      },
+      "errorsMore": "+{count} mas",
+      "rowsTitle": "Filas validas (muestra)",
+      "resultTitle": "Resultado",
+      "result": {
+        "processed": "Procesadas",
+        "created": "Creadas",
+        "updated": "Actualizadas",
+        "failed": "Fallidas"
+      }
+    },
+    "export": {
+      "title": "Exportar productos",
+      "subtitle": "Descarga un archivo con filtros y columnas seleccionadas.",
+      "format": "Formato",
+      "columns": "Columnas",
+      "columnsBase": "Base",
+      "columnsDynamic": "Atributos",
+      "columnsDynamicEmpty": "Sin atributos para listar.",
+      "download": "Descargar",
+      "addCustom": "Agregar columna de atributo",
+      "customPlaceholder": "key (ej: color)",
+      "customHint": "Se exporta como attr_<key>.",
+      "customInvalid": "La key no es valida.",
+      "columnsRequired": "Selecciona al menos una columna."
+    }
+  }
 }

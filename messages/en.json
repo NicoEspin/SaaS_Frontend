@@ -150,4 +150,206 @@
       "meta": "{value} ago"
     }
   }
+  ,
+  "Common": {
+    "actions": {
+      "apply": "Apply",
+      "reset": "Reset",
+      "create": "Create",
+      "save": "Save",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "close": "Close",
+      "refresh": "Refresh",
+      "add": "Add",
+      "edit": "Edit",
+      "loading": "Loading..."
+    },
+    "labels": {
+      "all": "All",
+      "active": "Active",
+      "inactive": "Inactive",
+      "yes": "Yes",
+      "no": "No",
+      "none": "None",
+      "actions": "Actions",
+      "select": "Select"
+    },
+    "errors": {
+      "generic": "Something went wrong. Please try again."
+    }
+  },
+  "Products": {
+    "actions": {
+      "new": "New product",
+      "import": "Import",
+      "export": "Export",
+      "manageAttributes": "Attributes",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "filters": {
+      "title": "Filters",
+      "q": "Search",
+      "qPlaceholder": "SKU, name, or attribute...",
+      "code": "Code",
+      "codePlaceholder": "e.g. SKU-001",
+      "name": "Name",
+      "namePlaceholder": "e.g. T-shirt",
+      "categoryId": "Category ID",
+      "categoryIdPlaceholder": "ULID (optional)",
+      "categoryName": "Category",
+      "categoryNamePlaceholder": "Category name",
+      "isActive": "Status"
+    },
+    "fields": {
+      "code": "Code",
+      "name": "Name",
+      "category": "Category",
+      "categoryId": "Category ID",
+      "description": "Description",
+      "isActive": "Active",
+      "updatedAt": "Updated",
+      "attributes": "Attributes"
+    },
+    "table": {
+      "title": "Products",
+      "count": "{count} items",
+      "empty": "No products match these filters."
+    },
+    "pagination": {
+      "loadMore": "Load more",
+      "moreAvailable": "More results available.",
+      "end": "End of results."
+    },
+    "form": {
+      "createTitle": "Create product",
+      "createSubtitle": "Fill in the details and save.",
+      "editTitle": "Edit product",
+      "editSubtitle": "Update the details and save.",
+      "categoryIdHint": "Category ULID (optional)",
+      "descriptionPlaceholder": "Internal notes or details...",
+      "attributesTitle": "Dynamic attributes",
+      "attributesSubtitle": "Loaded based on the selected category.",
+      "attributesNoCategory": "Select a category to see attributes.",
+      "attributesEmpty": "No definitions for this category."
+    },
+    "validation": {
+      "codeRequired": "Code is required.",
+      "nameRequired": "Name is required.",
+      "attributeRequired": "This attribute is required."
+    },
+    "errors": {
+      "codeConflict": "That code already exists."
+    },
+    "delete": {
+      "title": "Delete product",
+      "description": "You are about to delete {name} ({code}). This action cannot be undone.",
+      "confirm": "Delete"
+    }
+  },
+  "Attributes": {
+    "title": "Attribute definitions",
+    "subtitle": "Create and manage dynamic attributes by category.",
+    "categoryId": "Category ID",
+    "categoryIdPlaceholder": "Category ULID",
+    "fields": {
+      "key": "Key",
+      "label": "Label",
+      "type": "Type",
+      "options": "Options",
+      "unit": "Unit",
+      "required": "Required",
+      "visibleInTable": "Visible in table",
+      "sortOrder": "Order"
+    },
+    "empty": "No definitions.",
+    "keyPlaceholder": "e.g. color",
+    "keyHint": "Format: a-z, 0-9 and _",
+    "optionsPlaceholder": "One option per line or comma-separated",
+    "optionsHint": "Required only for ENUM.",
+    "unitPlaceholder": "e.g. cm, kg",
+    "editor": {
+      "create": "New definition",
+      "edit": "Edit definition",
+      "new": "New"
+    },
+    "types": {
+      "TEXT": "Text",
+      "NUMBER": "Number",
+      "BOOLEAN": "Boolean",
+      "DATE": "Date",
+      "ENUM": "List"
+    },
+    "actions": {
+      "delete": "Delete"
+    },
+    "errors": {
+      "categoryRequired": "Category ID is required.",
+      "invalidKey": "Key is not valid.",
+      "labelRequired": "Label is required.",
+      "sortOrderInvalid": "Invalid sort order.",
+      "enumOptionsRequired": "ENUM requires options."
+    },
+    "delete": {
+      "title": "Delete definition",
+      "description": "You are about to delete {label} ({key}).",
+      "confirm": "Delete"
+    }
+  },
+  "ImportExport": {
+    "import": {
+      "title": "Import products",
+      "subtitle": "Upload a CSV or XLSX, review the preview and confirm.",
+      "file": "File",
+      "fileHint": "Format .csv or .xlsx",
+      "mode": "Mode",
+      "modes": {
+        "create": "Create",
+        "update": "Update",
+        "upsert": "Upsert"
+      },
+      "preview": "Preview",
+      "confirm": "Confirm import",
+      "expired": "The preview expired or was not found. Please run preview again.",
+      "summaryTitle": "Summary",
+      "summary": {
+        "totalRows": "Rows",
+        "validRows": "Valid",
+        "invalidRows": "Invalid",
+        "willCreate": "Will create",
+        "willUpdate": "Will update"
+      },
+      "errorsTitle": "Errors",
+      "errors": {
+        "row": "Row",
+        "column": "Column",
+        "message": "Message"
+      },
+      "errorsMore": "+{count} more",
+      "rowsTitle": "Valid rows (sample)",
+      "resultTitle": "Result",
+      "result": {
+        "processed": "Processed",
+        "created": "Created",
+        "updated": "Updated",
+        "failed": "Failed"
+      }
+    },
+    "export": {
+      "title": "Export products",
+      "subtitle": "Download a file with the selected filters and columns.",
+      "format": "Format",
+      "columns": "Columns",
+      "columnsBase": "Base",
+      "columnsDynamic": "Attributes",
+      "columnsDynamicEmpty": "No attributes to list.",
+      "download": "Download",
+      "addCustom": "Add attribute column",
+      "customPlaceholder": "key (e.g. color)",
+      "customHint": "Exported as attr_<key>.",
+      "customInvalid": "Key is not valid.",
+      "columnsRequired": "Select at least one column."
+    }
+  }
 }
