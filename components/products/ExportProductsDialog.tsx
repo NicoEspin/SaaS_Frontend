@@ -3,14 +3,20 @@
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
-  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -114,18 +120,22 @@ export function ExportProductsDialog({
           <DialogDescription>{t("export.subtitle")}</DialogDescription>
         </DialogHeader>
 
-        <DialogBody>
+        <div className="grid gap-6">
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="export_format">{t("export.format")}</Label>
                 <Select
-                  id="export_format"
                   value={format}
-                  onChange={(e) => setFormat(e.target.value as ExportProductsFormat)}
+                  onValueChange={(value) => setFormat(value as ExportProductsFormat)}
                 >
-                  <option value="xlsx">xlsx</option>
-                  <option value="csv">csv</option>
+                  <SelectTrigger id="export_format" className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="xlsx">xlsx</SelectItem>
+                    <SelectItem value="csv">csv</SelectItem>
+                  </SelectContent>
                 </Select>
               </div>
 
@@ -146,21 +156,15 @@ export function ExportProductsDialog({
               </div>
 
               {exportHook.error ? (
-                <div
-                  className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
-                  role="alert"
-                >
-                  {exportHook.error}
-                </div>
+                <Alert variant="destructive" className="border-destructive/30 bg-destructive/10">
+                  <AlertDescription>{exportHook.error}</AlertDescription>
+                </Alert>
               ) : null}
 
               {customError ? (
-                <div
-                  className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
-                  role="alert"
-                >
-                  {customError}
-                </div>
+                <Alert variant="destructive" className="border-destructive/30 bg-destructive/10">
+                  <AlertDescription>{customError}</AlertDescription>
+                </Alert>
               ) : null}
             </div>
 
@@ -174,13 +178,16 @@ export function ExportProductsDialog({
 
                   <div className="grid grid-cols-1 gap-2">
                     {EXPORT_BASE_COLUMNS.map((c) => (
-                      <label key={c} className="flex items-center gap-2 text-sm">
+                      <div key={c} className="flex items-center gap-2 text-sm">
                         <Checkbox
+                          id={`export_col_${c}`}
                           checked={selected.has(c)}
-                          onChange={() => toggle(c)}
+                          onCheckedChange={() => toggle(c)}
                         />
-                        <span className="font-mono text-xs">{c}</span>
-                      </label>
+                        <Label htmlFor={`export_col_${c}`} className="font-mono text-xs">
+                          {c}
+                        </Label>
+                      </div>
                     ))}
                   </div>
 
@@ -193,10 +200,16 @@ export function ExportProductsDialog({
                   ) : (
                     <div className="grid grid-cols-1 gap-2">
                       {dynamicColumns.map((c) => (
-                        <label key={c} className="flex items-center gap-2 text-sm">
-                          <Checkbox checked={selected.has(c)} onChange={() => toggle(c)} />
-                          <span className="font-mono text-xs">{c}</span>
-                        </label>
+                        <div key={c} className="flex items-center gap-2 text-sm">
+                          <Checkbox
+                            id={`export_col_${c}`}
+                            checked={selected.has(c)}
+                            onCheckedChange={() => toggle(c)}
+                          />
+                          <Label htmlFor={`export_col_${c}`} className="font-mono text-xs">
+                            {c}
+                          </Label>
+                        </div>
                       ))}
                     </div>
                   )}
@@ -204,7 +217,7 @@ export function ExportProductsDialog({
               </div>
             </div>
           </div>
-        </DialogBody>
+        </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={exportHook.loading}>

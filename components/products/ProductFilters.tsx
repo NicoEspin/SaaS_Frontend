@@ -6,7 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export type ProductsUiFilters = {
   q: string;
@@ -97,18 +103,19 @@ export function ProductFilters({ value, onChange, onApply, onReset, loading }: P
           <div>
             <Label htmlFor="isActive">{t("filters.isActive")}</Label>
             <Select
-              id="isActive"
               value={value.isActive}
-              onChange={(e) =>
-                onChange({
-                  ...value,
-                  isActive: e.target.value as ProductsUiFilters["isActive"],
-                })
+              onValueChange={(next) =>
+                onChange({ ...value, isActive: next as ProductsUiFilters["isActive"] })
               }
             >
-              <option value="all">{tc("labels.all")}</option>
-              <option value="active">{tc("labels.active")}</option>
-              <option value="inactive">{tc("labels.inactive")}</option>
+              <SelectTrigger id="isActive" className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{tc("labels.all")}</SelectItem>
+                <SelectItem value="active">{tc("labels.active")}</SelectItem>
+                <SelectItem value="inactive">{tc("labels.inactive")}</SelectItem>
+              </SelectContent>
             </Select>
           </div>
 

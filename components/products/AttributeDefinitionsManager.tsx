@@ -6,14 +6,20 @@ import { useTranslations } from "next-intl";
 
 import { ConfirmDialog } from "@/components/products/ConfirmDialog";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
-  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -216,7 +222,7 @@ export function AttributeDefinitionsManager({ open, onOpenChange }: Props) {
             <DialogDescription>{t("subtitle")}</DialogDescription>
           </DialogHeader>
 
-          <DialogBody>
+          <div className="grid gap-6">
             <div className="grid grid-cols-1 gap-6 md:grid-cols-5">
               <div className="md:col-span-3 space-y-4">
                 <div className="space-y-2">
@@ -238,9 +244,9 @@ export function AttributeDefinitionsManager({ open, onOpenChange }: Props) {
                     </Button>
                   </div>
                   {error ? (
-                    <p className="text-sm text-destructive" role="alert">
-                      {error}
-                    </p>
+                    <Alert variant="destructive" className="border-destructive/30 bg-destructive/10">
+                      <AlertDescription>{error}</AlertDescription>
+                    </Alert>
                   ) : null}
                 </div>
 
@@ -342,20 +348,21 @@ export function AttributeDefinitionsManager({ open, onOpenChange }: Props) {
                   <div className="space-y-2">
                     <Label htmlFor="def_type">{t("fields.type")}</Label>
                     <Select
-                      id="def_type"
                       value={form.type}
-                      onChange={(e) =>
-                        setForm((s) => ({
-                          ...s,
-                          type: e.target.value as ProductAttributeDefinitionType,
-                        }))
+                      onValueChange={(value) =>
+                        setForm((s) => ({ ...s, type: value as ProductAttributeDefinitionType }))
                       }
                     >
-                      <option value="TEXT">{t("types.TEXT")}</option>
-                      <option value="NUMBER">{t("types.NUMBER")}</option>
-                      <option value="BOOLEAN">{t("types.BOOLEAN")}</option>
-                      <option value="DATE">{t("types.DATE")}</option>
-                      <option value="ENUM">{t("types.ENUM")}</option>
+                      <SelectTrigger id="def_type" className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="TEXT">{t("types.TEXT")}</SelectItem>
+                        <SelectItem value="NUMBER">{t("types.NUMBER")}</SelectItem>
+                        <SelectItem value="BOOLEAN">{t("types.BOOLEAN")}</SelectItem>
+                        <SelectItem value="DATE">{t("types.DATE")}</SelectItem>
+                        <SelectItem value="ENUM">{t("types.ENUM")}</SelectItem>
+                      </SelectContent>
                     </Select>
                   </div>
 
@@ -394,27 +401,33 @@ export function AttributeDefinitionsManager({ open, onOpenChange }: Props) {
                   </div>
 
                   <div className="space-y-3">
-                    <Switch
-                      checked={form.isRequired}
-                      onChange={(e) => setForm((s) => ({ ...s, isRequired: e.target.checked }))}
-                      label={t("fields.required")}
-                    />
-                    <Switch
-                      checked={form.isVisibleInTable}
-                      onChange={(e) =>
-                        setForm((s) => ({ ...s, isVisibleInTable: e.target.checked }))
-                      }
-                      label={t("fields.visibleInTable")}
-                    />
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        id="def_isRequired"
+                        checked={form.isRequired}
+                        onCheckedChange={(checked) =>
+                          setForm((s) => ({ ...s, isRequired: checked }))
+                        }
+                      />
+                      <Label htmlFor="def_isRequired">{t("fields.required")}</Label>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        id="def_isVisibleInTable"
+                        checked={form.isVisibleInTable}
+                        onCheckedChange={(checked) =>
+                          setForm((s) => ({ ...s, isVisibleInTable: checked }))
+                        }
+                      />
+                      <Label htmlFor="def_isVisibleInTable">{t("fields.visibleInTable")}</Label>
+                    </div>
                   </div>
 
                   {formError ? (
-                    <div
-                      className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
-                      role="alert"
-                    >
-                      {formError}
-                    </div>
+                    <Alert variant="destructive" className="border-destructive/30 bg-destructive/10">
+                      <AlertDescription>{formError}</AlertDescription>
+                    </Alert>
                   ) : null}
 
                   <Button type="submit" disabled={saving || !categoryId.trim()} className="w-full">
@@ -423,7 +436,7 @@ export function AttributeDefinitionsManager({ open, onOpenChange }: Props) {
                 </form>
               </div>
             </div>
-          </DialogBody>
+          </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => onOpenChange(false)}>

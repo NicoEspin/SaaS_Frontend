@@ -4,6 +4,7 @@ import { Pencil, Trash2 } from "lucide-react";
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -79,12 +80,12 @@ export function ProductTable({
         ) : null}
 
         {error ? (
-          <div
-            className="mb-4 rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
-            role="alert"
+          <Alert
+            variant="destructive"
+            className="mb-4 border-destructive/30 bg-destructive/10"
           >
-            {error}
-          </div>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
         ) : null}
 
         <Table>

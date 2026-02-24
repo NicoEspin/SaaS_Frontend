@@ -4,15 +4,21 @@ import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import axios from "axios";
 
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
-  DialogBody,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -29,6 +35,8 @@ import type {
 import { getAxiosErrorMessage } from "@/lib/products/utils";
 
 type Mode = "create" | "edit";
+
+const UNSET_SELECT_VALUE = "__unset__";
 
 type Props = {
   open: boolean;
@@ -177,7 +185,7 @@ export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Prop
           </DialogDescription>
         </DialogHeader>
 
-        <DialogBody>
+        <div className="grid gap-6">
           <form className="space-y-6" onSubmit={onSubmit}>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="space-y-2">
@@ -225,13 +233,15 @@ export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Prop
 
               <div className="space-y-2">
                 <Label htmlFor="product_isActive">{t("fields.isActive")}</Label>
-                <div className="flex h-10 items-center">
+                <div className="flex h-10 items-center gap-3">
                   <Switch
                     id="product_isActive"
                     checked={isActive}
-                    onChange={(e) => setIsActive(e.target.checked)}
-                    label={isActive ? tc("labels.active") : tc("labels.inactive")}
+                    onCheckedChange={(checked) => setIsActive(checked)}
                   />
+                  <div className="text-sm text-muted-foreground">
+                    {isActive ? tc("labels.active") : tc("labels.inactive")}
+                  </div>
                 </div>
               </div>
 
@@ -310,24 +320,30 @@ export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Prop
 
                         {def.type === "BOOLEAN" ? (
                           <Select
-                            id={fieldId}
                             value={
                               value === true
                                 ? "true"
                                 : value === false
                                   ? "false"
-                                  : ""
+                                  : UNSET_SELECT_VALUE
                             }
-                            onChange={(e) => {
-                              const raw = e.target.value;
-                              if (!raw) return setAttr(key, undefined);
+                            onValueChange={(raw) => {
+                              if (raw === UNSET_SELECT_VALUE) return setAttr(key, undefined);
                               setAttr(key, raw === "true");
                             }}
-                            aria-invalid={Boolean(fieldError)}
                           >
-                            <option value="">{tc("labels.select")}</option>
-                            <option value="true">{tc("labels.yes")}</option>
-                            <option value="false">{tc("labels.no")}</option>
+                            <SelectTrigger
+                              id={fieldId}
+                              aria-invalid={Boolean(fieldError)}
+                              className="w-full"
+                            >
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value={UNSET_SELECT_VALUE}>{tc("labels.select")}</SelectItem>
+                              <SelectItem value="true">{tc("labels.yes")}</SelectItem>
+                              <SelectItem value="false">{tc("labels.no")}</SelectItem>
+                            </SelectContent>
                           </Select>
                         ) : null}
 
@@ -343,17 +359,27 @@ export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Prop
 
                         {def.type === "ENUM" ? (
                           <Select
-                            id={fieldId}
-                            value={typeof value === "string" ? value : ""}
-                            onChange={(e) => setAttr(key, e.target.value)}
-                            aria-invalid={Boolean(fieldError)}
+                            value={typeof value === "string" ? value : UNSET_SELECT_VALUE}
+                            onValueChange={(raw) => {
+                              if (raw === UNSET_SELECT_VALUE) return setAttr(key, undefined);
+                              setAttr(key, raw);
+                            }}
                           >
-                            <option value="">{tc("labels.select")}</option>
-                            {(def.options ?? []).map((opt) => (
-                              <option key={opt} value={opt}>
-                                {opt}
-                              </option>
-                            ))}
+                            <SelectTrigger
+                              id={fieldId}
+                              aria-invalid={Boolean(fieldError)}
+                              className="w-full"
+                            >
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value={UNSET_SELECT_VALUE}>{tc("labels.select")}</SelectItem>
+                              {(def.options ?? []).map((opt) => (
+                                <SelectItem key={opt} value={opt}>
+                                  {opt}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
                           </Select>
                         ) : null}
 
@@ -370,12 +396,9 @@ export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Prop
             </div>
 
             {formError ? (
-              <div
-                className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
-                role="alert"
-              >
-                {formError}
-              </div>
+              <Alert variant="destructive" className="border-destructive/30 bg-destructive/10">
+                <AlertDescription>{formError}</AlertDescription>
+              </Alert>
             ) : null}
 
             <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
@@ -396,7 +419,7 @@ export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Prop
               </Button>
             </div>
           </form>
-        </DialogBody>
+        </div>
       </DialogContent>
     </Dialog>
   );

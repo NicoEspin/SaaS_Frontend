@@ -4,13 +4,19 @@ import axios from "axios";
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
-  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -101,7 +107,7 @@ export function ImportProductsDialog({ open, onOpenChange, onImported }: Props) 
           <DialogDescription>{t("import.subtitle")}</DialogDescription>
         </DialogHeader>
 
-        <DialogBody>
+        <div className="grid gap-6">
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div className="space-y-4">
               <div className="space-y-2">
@@ -121,13 +127,17 @@ export function ImportProductsDialog({ open, onOpenChange, onImported }: Props) 
               <div className="space-y-2">
                 <Label htmlFor="import_mode">{t("import.mode")}</Label>
                 <Select
-                  id="import_mode"
                   value={mode}
-                  onChange={(e) => setMode(e.target.value as ImportProductsMode)}
+                  onValueChange={(value) => setMode(value as ImportProductsMode)}
                 >
-                  <option value="create">{t("import.modes.create")}</option>
-                  <option value="update">{t("import.modes.update")}</option>
-                  <option value="upsert">{t("import.modes.upsert")}</option>
+                  <SelectTrigger id="import_mode" className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="create">{t("import.modes.create")}</SelectItem>
+                    <SelectItem value="update">{t("import.modes.update")}</SelectItem>
+                    <SelectItem value="upsert">{t("import.modes.upsert")}</SelectItem>
+                  </SelectContent>
                 </Select>
               </div>
 
@@ -141,12 +151,9 @@ export function ImportProductsDialog({ open, onOpenChange, onImported }: Props) 
               </div>
 
               {fatalError ? (
-                <div
-                  className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
-                  role="alert"
-                >
-                  {fatalError}
-                </div>
+                <Alert variant="destructive" className="border-destructive/30 bg-destructive/10">
+                  <AlertDescription>{fatalError}</AlertDescription>
+                </Alert>
               ) : null}
 
               {confirmHook.result ? (
@@ -226,7 +233,7 @@ export function ImportProductsDialog({ open, onOpenChange, onImported }: Props) 
               {t("import.expired")}
             </div>
           ) : null}
-        </DialogBody>
+        </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>

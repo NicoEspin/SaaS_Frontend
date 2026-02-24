@@ -11,6 +11,7 @@ import { ImportProductsDialog } from "@/components/products/ImportProductsDialog
 import { ProductFilters, type ProductsUiFilters } from "@/components/products/ProductFilters";
 import { ProductForm } from "@/components/products/ProductForm";
 import { ProductTable } from "@/components/products/ProductTable";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import type { Product, ProductsListQuery } from "@/lib/products/types";
 import { useAttributeDefinitions } from "@/lib/products/hooks/use-attribute-definitions";
@@ -203,12 +204,9 @@ export function ProductsClient() {
       />
 
       {deleteMut.error ? (
-        <div
-          className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
-          role="alert"
-        >
-          {deleteMut.error}
-        </div>
+        <Alert variant="destructive" className="border-destructive/30 bg-destructive/10">
+          <AlertDescription>{deleteMut.error}</AlertDescription>
+        </Alert>
       ) : null}
     </section>
   );

@@ -1,51 +1,35 @@
-import * as React from "react";
+"use client"
 
-import { cn } from "@/lib/utils";
+import * as React from "react"
+import { Switch as SwitchPrimitive } from "radix-ui"
 
-type Props = Omit<React.ComponentPropsWithoutRef<"input">, "type"> & {
-  label?: string;
-};
+import { cn } from "@/lib/utils"
 
-export const Switch = React.forwardRef<HTMLInputElement, Props>(
-  ({ className, checked, disabled, onChange, label, ...props }, ref) => {
-    return (
-      <label
+function Switch({
+  className,
+  size = "default",
+  ...props
+}: React.ComponentProps<typeof SwitchPrimitive.Root> & {
+  size?: "sm" | "default"
+}) {
+  return (
+    <SwitchPrimitive.Root
+      data-slot="switch"
+      data-size={size}
+      className={cn(
+        "peer data-[state=checked]:bg-primary data-[state=unchecked]:bg-input focus-visible:border-ring focus-visible:ring-ring/50 dark:data-[state=unchecked]:bg-input/80 group/switch inline-flex shrink-0 items-center rounded-full border border-transparent shadow-xs transition-all outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 data-[size=default]:h-[1.15rem] data-[size=default]:w-8 data-[size=sm]:h-3.5 data-[size=sm]:w-6",
+        className
+      )}
+      {...props}
+    >
+      <SwitchPrimitive.Thumb
+        data-slot="switch-thumb"
         className={cn(
-          "inline-flex items-center gap-2",
-          disabled && "cursor-not-allowed opacity-60",
-          className
+          "bg-background dark:data-[state=unchecked]:bg-foreground dark:data-[state=checked]:bg-primary-foreground pointer-events-none block rounded-full ring-0 transition-transform group-data-[size=default]/switch:size-4 group-data-[size=sm]/switch:size-3 data-[state=checked]:translate-x-[calc(100%-2px)] data-[state=unchecked]:translate-x-0"
         )}
-      >
-        <span className="relative inline-flex h-6 w-10 items-center">
-          <input
-            ref={ref}
-            type="checkbox"
-            className="peer sr-only"
-            checked={checked}
-            disabled={disabled}
-            onChange={onChange}
-            {...props}
-          />
-          <span
-            aria-hidden="true"
-            className={cn(
-              "absolute inset-0 rounded-full border border-border bg-muted transition-colors",
-              "peer-checked:bg-primary peer-checked:border-primary",
-              "peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2"
-            )}
-          />
-          <span
-            aria-hidden="true"
-            className={cn(
-              "absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-background shadow-sm transition-transform",
-              "peer-checked:translate-x-4"
-            )}
-          />
-        </span>
-        {label ? <span className="text-sm text-foreground">{label}</span> : null}
-      </label>
-    );
-  }
-);
+      />
+    </SwitchPrimitive.Root>
+  )
+}
 
-Switch.displayName = "Switch";
+export { Switch }
