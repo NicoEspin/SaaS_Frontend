@@ -4,7 +4,7 @@ import { create } from "zustand";
 import type { AxiosError } from "axios";
 
 import { apiClient } from "@/lib/api-client";
-import { getLocaleFromPathname } from "@/lib/routes";
+import { getLoginPathForPathname } from "@/lib/routes";
 
 export type LoginDto = {
   tenantSlug: string;
@@ -18,7 +18,8 @@ export type LoginResponse = {
 
 export type OnboardingInitialDto = {
   tenant: { name: string; slug: string };
-  admin: { email: string; password: string };
+  branch?: { name: string };
+  admin: { fullName: string; email: string; password: string };
 };
 
 export type OnboardingInitialResponse = {
@@ -36,15 +37,16 @@ type AuthState = {
   logout: (options?: LogoutOptions) => void;
 
   login: (dto: LoginDto) => Promise<LoginResponse>;
-  onboardingInitial: (dto: OnboardingInitialDto) => Promise<OnboardingInitialResponse>;
+  onboardingInitial: (
+    dto: OnboardingInitialDto,
+  ) => Promise<OnboardingInitialResponse>;
 };
 
 function redirectToLogin(options?: LogoutOptions) {
   if (typeof window === "undefined") return;
 
-  const locale = getLocaleFromPathname(window.location.pathname) ?? "es";
   const url = new URL(window.location.href);
-  url.pathname = `/${locale}/login`;
+  url.pathname = getLoginPathForPathname(window.location.pathname);
   url.search = "";
   if (options?.reason === "expired") url.searchParams.set("reason", "expired");
   window.location.assign(url.toString());
@@ -72,7 +74,7 @@ export const useAuthStore = create<AuthState>()(() => ({
   onboardingInitial: async (dto) => {
     const res = await apiClient.post<OnboardingInitialResponse>(
       "/onboarding/initial",
-      dto
+      dto,
     );
     return res.data;
   },

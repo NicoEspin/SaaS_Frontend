@@ -18,13 +18,16 @@ import { Link, useRouter } from "@/i18n/navigation";
 import { useOnboardingDraftStore } from "@/stores/onboarding-draft-store";
 import { isValidEmail, isValidPassword } from "@/lib/validators";
 
-type FieldErrors = Partial<Record<"email" | "password" | "confirmPassword", string>>;
+type FieldErrors = Partial<
+  Record<"fullName" | "email" | "password" | "confirmPassword", string>
+>;
 
 export default function RegisterPage() {
   const t = useTranslations("Auth");
   const router = useRouter();
   const setDraftAdmin = useOnboardingDraftStore((s) => s.setAdmin);
 
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -32,7 +35,10 @@ export default function RegisterPage() {
 
   function validate() {
     const nextErrors: FieldErrors = {};
-    if (!isValidEmail(email)) nextErrors.email = t("common.validation.invalidEmail");
+    if (!fullName.trim())
+      nextErrors.fullName = t("register.validation.fullNameRequired");
+    if (!isValidEmail(email))
+      nextErrors.email = t("common.validation.invalidEmail");
     if (!isValidPassword(password))
       nextErrors.password = t("common.validation.passwordMin", { min: 8 });
     if (confirmPassword !== password)
@@ -45,7 +51,7 @@ export default function RegisterPage() {
     e.preventDefault();
     if (!validate()) return;
 
-    setDraftAdmin({ email: email.trim(), password });
+    setDraftAdmin({ fullName: fullName.trim(), email: email.trim(), password });
     router.push("/onboarding");
   }
 
@@ -58,6 +64,23 @@ export default function RegisterPage() {
 
       <CardContent>
         <form className="space-y-4" onSubmit={onSubmit}>
+          <div className="space-y-2">
+            <Label htmlFor="fullName">{t("fields.fullName")}</Label>
+            <Input
+              id="fullName"
+              name="fullName"
+              autoComplete="name"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              aria-invalid={Boolean(errors.fullName)}
+            />
+            {errors.fullName ? (
+              <p className="text-sm text-destructive" role="alert">
+                {errors.fullName}
+              </p>
+            ) : null}
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="email">{t("fields.email")}</Label>
             <Input
@@ -95,7 +118,9 @@ export default function RegisterPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword">{t("fields.confirmPassword")}</Label>
+            <Label htmlFor="confirmPassword">
+              {t("fields.confirmPassword")}
+            </Label>
             <Input
               id="confirmPassword"
               name="confirmPassword"
@@ -120,8 +145,11 @@ export default function RegisterPage() {
 
       <CardFooter className="justify-center">
         <p className="text-sm text-muted-foreground">
-          {t("register.actions.haveAccount")} {" "}
-          <Link className="text-primary underline-offset-4 hover:underline" href="/login">
+          {t("register.actions.haveAccount")}{" "}
+          <Link
+            className="text-primary underline-offset-4 hover:underline"
+            href="/login"
+          >
             {t("register.actions.goLogin")}
           </Link>
         </p>

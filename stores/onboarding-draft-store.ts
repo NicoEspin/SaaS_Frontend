@@ -3,6 +3,7 @@
 import { create } from "zustand";
 
 export type DraftAdmin = {
+  fullName: string;
   email: string;
   password: string;
 };
@@ -13,10 +14,8 @@ type DraftState = {
   clear: () => void;
 };
 
-export const useOnboardingDraftStore = create<DraftState>()(
-  (set) => ({
-    admin: null,
-    setAdmin: (admin) => set({ admin }),
-    clear: () => set({ admin: null }),
-  })
-);
+export const useOnboardingDraftStore = create<DraftState>()((set) => ({
+  admin: null,
+  setAdmin: (admin) => set({ admin }),
+  clear: () => set({ admin: null }),
+}));

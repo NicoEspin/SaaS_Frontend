@@ -15,17 +15,37 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link, useRouter } from "@/i18n/navigation";
-import { normalizeTenantSlug, isValidEmail, isValidPassword, isValidTenantSlug } from "@/lib/validators";
+import { isValidEmail, isValidPassword } from "@/lib/validators";
 import { useAuthStore, isAxiosError } from "@/stores/auth-store";
 import { useOnboardingDraftStore } from "@/stores/onboarding-draft-store";
 
 type FieldErrors = Partial<
-  Record<"tenantName" | "tenantSlug" | "adminEmail" | "adminPassword", string>
+  Record<
+    | "tenantName"
+    | "branchName"
+    | "adminFullName"
+    | "adminEmail"
+    | "adminPassword",
+    string
+  >
 >;
+
+function slugifyTenantName(input: string) {
+  const raw = input.trim().toLowerCase();
+  const noSymbols = raw
+    .replace(/[\s_]+/g, "-")
+    .replace(/[^a-z0-9-]/g, "")
+    .replace(/-+/g, "-");
+  const sliced = noSymbols.slice(0, 64);
+  return sliced.replace(/^-+/, "").replace(/-+$/, "");
+}
 
 function getBackendMessage(data: unknown): string | null {
   if (!data || typeof data !== "object") return null;
-  if ("message" in data && typeof (data as { message?: unknown }).message === "string") {
+  if (
+    "message" in data &&
+    typeof (data as { message?: unknown }).message === "string"
+  ) {
     return (data as { message: string }).message;
   }
   return null;
@@ -40,7 +60,8 @@ export default function OnboardingPage() {
   const clearDraft = useOnboardingDraftStore((s) => s.clear);
 
   const [tenantName, setTenantName] = useState("");
-  const [tenantSlug, setTenantSlug] = useState("");
+  const [branchName, setBranchName] = useState("");
+  const [adminFullName, setAdminFullName] = useState("");
   const [adminEmail, setAdminEmail] = useState("");
   const [adminPassword, setAdminPassword] = useState("");
   const [errors, setErrors] = useState<FieldErrors>({});
@@ -49,6 +70,7 @@ export default function OnboardingPage() {
 
   useEffect(() => {
     if (!draftAdmin) return;
+    setAdminFullName((prev) => prev || draftAdmin.fullName);
     setAdminEmail((prev) => prev || draftAdmin.email);
     setAdminPassword((prev) => prev || draftAdmin.password);
   }, [draftAdmin]);
@@ -57,13 +79,16 @@ export default function OnboardingPage() {
 
   function validate() {
     const nextErrors: FieldErrors = {};
-    if (!tenantName.trim()) nextErrors.tenantName = t("onboarding.validation.tenantNameRequired");
-    if (!tenantSlug.trim()) {
-      nextErrors.tenantSlug = t("onboarding.validation.tenantSlugRequired");
-    } else if (!isValidTenantSlug(tenantSlug)) {
-      nextErrors.tenantSlug = t("onboarding.validation.tenantSlugInvalid");
-    }
-    if (!isValidEmail(adminEmail)) nextErrors.adminEmail = t("common.validation.invalidEmail");
+    if (!tenantName.trim())
+      nextErrors.tenantName = t("onboarding.validation.tenantNameRequired");
+    if (!branchName.trim())
+      nextErrors.branchName = t("onboarding.validation.branchNameRequired");
+    if (!adminFullName.trim())
+      nextErrors.adminFullName = t(
+        "onboarding.validation.adminFullNameRequired",
+      );
+    if (!isValidEmail(adminEmail))
+      nextErrors.adminEmail = t("common.validation.invalidEmail");
     if (!isValidPassword(adminPassword))
       nextErrors.adminPassword = t("common.validation.passwordMin", { min: 8 });
     setErrors(nextErrors);
@@ -78,8 +103,16 @@ export default function OnboardingPage() {
     setSubmitting(true);
     try {
       await onboardingInitial({
-        tenant: { name: tenantName.trim(), slug: normalizeTenantSlug(tenantSlug) },
-        admin: { email: adminEmail.trim(), password: adminPassword },
+        tenant: {
+          name: tenantName.trim(),
+          slug: slugifyTenantName(tenantName),
+        },
+        branch: { name: branchName.trim() },
+        admin: {
+          fullName: adminFullName.trim(),
+          email: adminEmail.trim(),
+          password: adminPassword,
+        },
       });
       clearDraft();
       router.replace("/");
@@ -105,7 +138,9 @@ export default function OnboardingPage() {
       <CardContent>
         <form className="space-y-5" onSubmit={onSubmit}>
           <div className="space-y-3">
-            <div className="text-sm font-semibold tracking-tight">{t("onboarding.sections.tenant")}</div>
+            <div className="text-sm font-semibold tracking-tight">
+              {t("onboarding.sections.tenant")}
+            </div>
 
             <div className="space-y-2">
               <Label htmlFor="tenantName">{t("fields.tenantName")}</Label>
@@ -125,26 +160,44 @@ export default function OnboardingPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="tenantSlug">{t("fields.tenantSlug")}</Label>
+              <Label htmlFor="branchName">{t("fields.branchName")}</Label>
               <Input
-                id="tenantSlug"
-                name="tenantSlug"
+                id="branchName"
+                name="branchName"
                 autoComplete="off"
-                value={tenantSlug}
-                onChange={(e) => setTenantSlug(e.target.value)}
-                aria-invalid={Boolean(errors.tenantSlug)}
+                value={branchName}
+                onChange={(e) => setBranchName(e.target.value)}
+                aria-invalid={Boolean(errors.branchName)}
               />
-              {errors.tenantSlug ? (
+              {errors.branchName ? (
                 <p className="text-sm text-destructive" role="alert">
-                  {errors.tenantSlug}
+                  {errors.branchName}
                 </p>
               ) : null}
-              <p className="text-xs text-muted-foreground">{t("onboarding.hints.slug")}</p>
             </div>
           </div>
 
           <div className="space-y-3">
-            <div className="text-sm font-semibold tracking-tight">{t("onboarding.sections.admin")}</div>
+            <div className="text-sm font-semibold tracking-tight">
+              {t("onboarding.sections.admin")}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="adminFullName">{t("fields.fullName")}</Label>
+              <Input
+                id="adminFullName"
+                name="adminFullName"
+                autoComplete="name"
+                value={adminFullName}
+                onChange={(e) => setAdminFullName(e.target.value)}
+                aria-invalid={Boolean(errors.adminFullName)}
+              />
+              {errors.adminFullName ? (
+                <p className="text-sm text-destructive" role="alert">
+                  {errors.adminFullName}
+                </p>
+              ) : null}
+            </div>
 
             <div className="space-y-2">
               <Label htmlFor="adminEmail">{t("fields.email")}</Label>
@@ -184,20 +237,28 @@ export default function OnboardingPage() {
           </div>
 
           {formError ? (
-            <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
+            <div
+              className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+              role="alert"
+            >
               {formError}
             </div>
           ) : null}
 
           <Button className="w-full" type="submit" disabled={submitting}>
-            {submitting ? t("common.actions.loading") : t("onboarding.actions.submit")}
+            {submitting
+              ? t("common.actions.loading")
+              : t("onboarding.actions.submit")}
           </Button>
         </form>
       </CardContent>
 
       <CardFooter className="justify-center">
         <p className="text-sm text-muted-foreground">
-          <Link className="text-primary underline-offset-4 hover:underline" href="/login">
+          <Link
+            className="text-primary underline-offset-4 hover:underline"
+            href="/login"
+          >
             {t("onboarding.actions.backToLogin")}
           </Link>
         </p>

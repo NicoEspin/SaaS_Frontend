@@ -27,8 +27,10 @@
       }
     },
     "fields": {
-      "tenantName": "Nombre del espacio",
+      "fullName": "Nombre completo",
+      "tenantName": "Nombre de la empresa",
       "tenantSlug": "Slug del espacio",
+      "branchName": "Nombre de sucursal",
       "email": "Email",
       "password": "Password",
       "confirmPassword": "Confirmar password"
@@ -58,6 +60,7 @@
         "goLogin": "Iniciar sesion"
       },
       "validation": {
+        "fullNameRequired": "El nombre completo es obligatorio.",
         "passwordsMismatch": "Las passwords no coinciden."
       }
     },
@@ -76,12 +79,14 @@
         "backToLogin": "Volver al login"
       },
       "validation": {
-        "tenantNameRequired": "El nombre del espacio es obligatorio.",
+        "adminFullNameRequired": "El nombre completo del admin es obligatorio.",
+        "tenantNameRequired": "El nombre de la empresa es obligatorio.",
         "tenantSlugRequired": "El slug del espacio es obligatorio.",
-        "tenantSlugInvalid": "El slug solo puede contener letras, numeros y guiones."
+        "tenantSlugInvalid": "El slug solo puede contener letras, numeros y guiones.",
+        "branchNameRequired": "El nombre de la sucursal es obligatorio."
       },
       "errors": {
-        "conflict": "Ese slug o email ya existe."
+        "conflict": "Ese nombre de empresa o email ya existe."
       }
     }
   },
@@ -149,8 +154,7 @@
       "export": "Reporte exportado",
       "meta": "hace {value}"
     }
-  }
-  ,
+  },
   "Common": {
     "actions": {
       "apply": "Aplicar",
@@ -227,7 +231,16 @@
       "createSubtitle": "Completa los datos y guarda.",
       "editTitle": "Editar producto",
       "editSubtitle": "Actualiza los datos y guarda.",
-      "categoryIdHint": "ULID de categoria (opcional)",
+      "sections": {
+        "basicsTitle": "Datos principales",
+        "basicsSubtitle": "Codigo, nombre y estado.",
+        "catalogTitle": "Catalogo",
+        "catalogSubtitle": "Categoria (opcional) y descripcion."
+      },
+      "categorySelectPlaceholder": "Seleccionar categoria (opcional)",
+      "categoryEmpty": "No hay categorias.",
+      "categoryCreatePlaceholder": "Crear categoria (ej: Ropa)",
+      "categoryCreateAction": "Crear",
       "descriptionPlaceholder": "Notas internas o detalles...",
       "attributesTitle": "Atributos dinamicos",
       "attributesSubtitle": "Se cargan segun la categoria.",
@@ -295,6 +308,58 @@
       "title": "Eliminar definicion",
       "description": "Vas a eliminar {label} ({key}).",
       "confirm": "Eliminar"
+    },
+    "categories": {
+      "title": "Categorias",
+      "subtitle": "Crea, busca y edita categorias para tus atributos.",
+      "search": "Buscar",
+      "searchPlaceholder": "Nombre de categoria",
+      "select": "Categoria",
+      "selectPlaceholder": "Seleccionar categoria",
+      "empty": "Sin categorias.",
+      "create": "Nueva categoria",
+      "createPlaceholder": "Ej: Ropa",
+      "edit": "Editar categoria",
+      "editPlaceholder": "Nombre de categoria",
+      "noneSelected": "Selecciona una categoria para gestionar atributos.",
+      "actions": {
+        "loadMore": "Cargar mas",
+        "new": "Nueva categoria",
+        "clear": "Limpiar",
+        "delete": "Eliminar categoria"
+      },
+      "createPanel": {
+        "title": "Crear categoria",
+        "subtitle": "Podes agregar atributos al momento de crearla.",
+        "name": "Nombre",
+        "attributesTitle": "Atributos iniciales",
+        "attributesSubtitle": "Opcional. Podes agregar todos los que quieras.",
+        "attributesEmpty": "Todavia no agregaste atributos.",
+        "attributesCount": "{count} atributos",
+        "actions": {
+          "addAttribute": "Agregar atributo"
+        },
+        "editor": {
+          "create": "Nuevo atributo",
+          "edit": "Editar atributo",
+          "new": "Nuevo"
+        },
+        "errors": {
+          "nameRequired": "El nombre de la categoria es obligatorio.",
+          "duplicateKey": "La key '{key}' ya existe en la lista."
+        }
+      },
+      "delete": {
+        "title": "Eliminar categoria",
+        "description": "Vas a eliminar {name}. Esta accion no se puede deshacer.",
+        "confirm": "Eliminar"
+      }
+    },
+    "definitions": {
+      "title": "Atributos",
+      "forCategory": "Categoria: {name}",
+      "noCategory": "Sin categoria seleccionada.",
+      "noCategoryEmpty": "Selecciona una categoria para ver definiciones."
     }
   },
   "ImportExport": {
@@ -347,7 +412,7 @@
       "download": "Descargar",
       "addCustom": "Agregar columna de atributo",
       "customPlaceholder": "key (ej: color)",
-      "customHint": "Se exporta como attr_<key>.",
+      "customHint": "Se exporta como attr_[key].",
       "customInvalid": "La key no es valida.",
       "columnsRequired": "Selecciona al menos una columna."
     }

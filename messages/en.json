@@ -27,8 +27,10 @@
       }
     },
     "fields": {
-      "tenantName": "Workspace name",
+      "fullName": "Full name",
+      "tenantName": "Company name",
       "tenantSlug": "Workspace slug",
+      "branchName": "Branch name",
       "email": "Email",
       "password": "Password",
       "confirmPassword": "Confirm password"
@@ -58,6 +60,7 @@
         "goLogin": "Sign in"
       },
       "validation": {
+        "fullNameRequired": "Full name is required.",
         "passwordsMismatch": "Passwords do not match."
       }
     },
@@ -76,12 +79,14 @@
         "backToLogin": "Back to login"
       },
       "validation": {
-        "tenantNameRequired": "Workspace name is required.",
+        "adminFullNameRequired": "Admin full name is required.",
+        "tenantNameRequired": "Company name is required.",
         "tenantSlugRequired": "Workspace slug is required.",
-        "tenantSlugInvalid": "Workspace slug can only contain letters, numbers, and hyphens."
+        "tenantSlugInvalid": "Workspace slug can only contain letters, numbers, and hyphens.",
+        "branchNameRequired": "Branch name is required."
       },
       "errors": {
-        "conflict": "That slug or email is already in use."
+        "conflict": "That company name or email is already in use."
       }
     }
   },
@@ -149,8 +154,7 @@
       "export": "Report exported",
       "meta": "{value} ago"
     }
-  }
-  ,
+  },
   "Common": {
     "actions": {
       "apply": "Apply",
@@ -227,7 +231,16 @@
       "createSubtitle": "Fill in the details and save.",
       "editTitle": "Edit product",
       "editSubtitle": "Update the details and save.",
-      "categoryIdHint": "Category ULID (optional)",
+      "sections": {
+        "basicsTitle": "Basics",
+        "basicsSubtitle": "Code, name, and status.",
+        "catalogTitle": "Catalog",
+        "catalogSubtitle": "Category (optional) and description."
+      },
+      "categorySelectPlaceholder": "Select category (optional)",
+      "categoryEmpty": "No categories.",
+      "categoryCreatePlaceholder": "Create category (e.g. Apparel)",
+      "categoryCreateAction": "Create",
       "descriptionPlaceholder": "Internal notes or details...",
       "attributesTitle": "Dynamic attributes",
       "attributesSubtitle": "Loaded based on the selected category.",
@@ -295,6 +308,58 @@
       "title": "Delete definition",
       "description": "You are about to delete {label} ({key}).",
       "confirm": "Delete"
+    },
+    "categories": {
+      "title": "Categories",
+      "subtitle": "Create, search, and edit categories for your attributes.",
+      "search": "Search",
+      "searchPlaceholder": "Category name",
+      "select": "Category",
+      "selectPlaceholder": "Select category",
+      "empty": "No categories.",
+      "create": "New category",
+      "createPlaceholder": "e.g. Apparel",
+      "edit": "Edit category",
+      "editPlaceholder": "Category name",
+      "noneSelected": "Select a category to manage attributes.",
+      "actions": {
+        "loadMore": "Load more",
+        "new": "New category",
+        "clear": "Clear",
+        "delete": "Delete category"
+      },
+      "createPanel": {
+        "title": "Create category",
+        "subtitle": "You can add attributes when creating it.",
+        "name": "Name",
+        "attributesTitle": "Initial attributes",
+        "attributesSubtitle": "Optional. Add as many as you need.",
+        "attributesEmpty": "No attributes added yet.",
+        "attributesCount": "{count} attributes",
+        "actions": {
+          "addAttribute": "Add attribute"
+        },
+        "editor": {
+          "create": "New attribute",
+          "edit": "Edit attribute",
+          "new": "New"
+        },
+        "errors": {
+          "nameRequired": "Category name is required.",
+          "duplicateKey": "Key '{key}' already exists in the list."
+        }
+      },
+      "delete": {
+        "title": "Delete category",
+        "description": "You are about to delete {name}. This action cannot be undone.",
+        "confirm": "Delete"
+      }
+    },
+    "definitions": {
+      "title": "Attributes",
+      "forCategory": "Category: {name}",
+      "noCategory": "No category selected.",
+      "noCategoryEmpty": "Select a category to view definitions."
     }
   },
   "ImportExport": {
@@ -347,7 +412,7 @@
       "download": "Download",
       "addCustom": "Add attribute column",
       "customPlaceholder": "key (e.g. color)",
-      "customHint": "Exported as attr_<key>.",
+      "customHint": "Exported as attr_[key].",
       "customInvalid": "Key is not valid.",
       "columnsRequired": "Select at least one column."
     }
