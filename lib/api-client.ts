@@ -35,7 +35,9 @@ let refreshPromise: Promise<void> | null = null;
 
 function isRefreshableRequest(config: InternalAxiosRequestConfig) {
   const url = config.url ?? "";
-  // Never attempt refresh for auth endpoints.
+  // Avoid refresh loops for auth endpoints, except /auth/session.
+  // /auth/session is a safe read and is required to hydrate the UI.
+  if (url === "/auth/session") return true;
   return !url.startsWith("/auth/");
 }
 
@@ -63,10 +65,11 @@ apiClient.interceptors.response.use(
     const config = error.config as RetriableRequestConfig | undefined;
 
     if (status === 401 && typeof window !== "undefined" && config) {
-      // Avoid redirect loops for auth endpoints.
-      if ((config.url ?? "").startsWith("/auth/")) {
-        return Promise.reject(error);
-      }
+      const url = config.url ?? "";
+      const isAuthEndpoint = url.startsWith("/auth/");
+      const isSessionEndpoint = url === "/auth/session";
+      // Avoid redirect loops for auth endpoints (except /auth/session).
+      if (isAuthEndpoint && !isSessionEndpoint) return Promise.reject(error);
 
       if (!config._retry && isRefreshableRequest(config)) {
         config._retry = true;
@@ -80,7 +83,7 @@ apiClient.interceptors.response.use(
 
       const pathname = window.location.pathname;
       if (!isPublicPathname(pathname)) {
-        useAuthStore.getState().logout({ reason: "expired" });
+        void useAuthStore.getState().logout({ reason: "expired" });
       }
     }
     return Promise.reject(error);

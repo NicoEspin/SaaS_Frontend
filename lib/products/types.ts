@@ -38,6 +38,11 @@ export type ProductCreateDto = {
   description?: string;
   isActive?: boolean;
   attributes?: Record<string, unknown>;
+  initialStock?: Array<{
+    branchId: string;
+    stockOnHand: number;
+    price: number;
+  }>;
 };
 
 export type ProductUpdateDto = {

@@ -2,6 +2,7 @@
   "Nav": {
     "brand": "Stock",
     "dashboard": "Dashboard",
+    "branches": "Branches",
     "inventory": "Inventory",
     "products": "Products",
     "reports": "Reports",
@@ -11,7 +12,9 @@
     "collapseSidebar": "Collapse sidebar",
     "expandSidebar": "Expand sidebar",
     "themeToDark": "Switch to dark mode",
-    "themeToLight": "Switch to light mode"
+    "themeToLight": "Switch to light mode",
+    "activeBranchAria": "Active branch: {branch}",
+    "userAria": "Signed in as {name}"
   },
   "Auth": {
     "common": {
@@ -93,8 +96,14 @@
   "Pages": {
     "dashboardTitle": "Dashboard",
     "dashboardSubtitle": "Overview and quick actions.",
+    "branchesTitle": "Branches",
+    "branchesSubtitle": "Create, rename, and remove branches.",
     "inventoryTitle": "Inventory",
     "inventorySubtitle": "Manage stock levels and locations.",
+    "inventory": {
+      "title": "Inventory",
+      "subtitle": "Stock management by branch"
+    },
     "productsTitle": "Products",
     "productsSubtitle": "Create and update your catalog.",
     "reportsTitle": "Reports",
@@ -183,6 +192,54 @@
       "generic": "Something went wrong. Please try again."
     }
   },
+  "EmptyState": {
+    "noRecords": {
+      "title": "Nothing here yet",
+      "description": "Create your first item to get started."
+    },
+    "noResults": {
+      "title": "No results",
+      "description": "Try adjusting your search or filters."
+    }
+  },
+  "Inventory": {
+    "title": "Inventory",
+    "subtitle": "Manage stock levels across branches",
+    "activeBranchLabel": "Active branch",
+    "selectBranch": "Select a branch",
+    "noBranchSelected": "Select a branch to view stock",
+    "emptyState": "No stock records for this branch",
+    "actions": {
+      "refreshBranches": "Refresh branches",
+      "refreshInventory": "Refresh inventory"
+    },
+    "columns": {
+      "code": "Code",
+      "name": "Product",
+      "category": "Category",
+      "stock": "Stock",
+      "price": "Price",
+      "actions": "Actions"
+    },
+    "adjust": "Adjust",
+    "transfer": "Transfer",
+    "adjustDialog": {
+      "title": "Adjust Stock",
+      "quantity": "Quantity (+ add / - subtract)",
+      "notes": "Notes (optional)",
+      "submit": "Apply Adjustment"
+    },
+    "transferDialog": {
+      "title": "Transfer Stock",
+      "toBranch": "Destination branch",
+      "quantity": "Quantity",
+      "submit": "Transfer"
+    },
+    "success": {
+      "adjusted": "Stock adjusted",
+      "transferred": "Stock transferred"
+    }
+  },
   "Products": {
     "actions": {
       "new": "New product",
@@ -194,6 +251,7 @@
     },
     "filters": {
       "title": "Filters",
+      "activeCount": "{count} active",
       "q": "Search",
       "qPlaceholder": "SKU, name, or attribute...",
       "code": "Code",
@@ -204,7 +262,8 @@
       "categoryIdPlaceholder": "ULID (optional)",
       "categoryName": "Category",
       "categoryNamePlaceholder": "Category name",
-      "isActive": "Status"
+      "isActive": "Status",
+      "advanced": "More filters"
     },
     "fields": {
       "code": "Code",
@@ -215,6 +274,18 @@
       "isActive": "Active",
       "updatedAt": "Updated",
       "attributes": "Attributes"
+    },
+    "initialStock": {
+      "toggle": "Set initial stock",
+      "subtitle": "Optional. Fill branch, stock and price.",
+      "disabledHint": "Enable this to preload stock and price by branch.",
+      "branch": "Branch",
+      "addBranch": "Add branch",
+      "remove": "Remove",
+      "stockOnHand": "Stock on hand",
+      "price": "Price",
+      "rowInvalid": "Complete branch, stock and price.",
+      "rowsInvalid": "Fix {count} initial stock rows."
     },
     "table": {
       "title": "Products",
@@ -231,6 +302,11 @@
       "createSubtitle": "Fill in the details and save.",
       "editTitle": "Edit product",
       "editSubtitle": "Update the details and save.",
+      "tabs": {
+        "details": "Details",
+        "attributes": "Attributes",
+        "stock": "Initial stock"
+      },
       "sections": {
         "basicsTitle": "Basics",
         "basicsSubtitle": "Code, name, and status.",
@@ -254,6 +330,11 @@
     },
     "errors": {
       "codeConflict": "That code already exists."
+    },
+    "success": {
+      "created": "Product created",
+      "updated": "Product updated",
+      "deleted": "Product deleted"
     },
     "delete": {
       "title": "Delete product",
@@ -362,6 +443,59 @@
       "noCategoryEmpty": "Select a category to view definitions."
     }
   },
+  "Branches": {
+    "title": "Branches",
+    "subtitle": "Manage branches in your workspace.",
+    "actions": {
+      "new": "New branch",
+      "delete": "Delete"
+    },
+    "filters": {
+      "q": "Search",
+      "qPlaceholder": "Search by name..."
+    },
+    "table": {
+      "title": "Branches",
+      "count": "{count} items",
+      "empty": "No branches found.",
+      "columns": {
+        "name": "Name",
+        "id": "ID",
+        "createdAt": "Created",
+        "updatedAt": "Updated"
+      }
+    },
+    "form": {
+      "createTitle": "Create branch",
+      "createSubtitle": "Add a new branch to your workspace.",
+      "editTitle": "Edit branch",
+      "editSubtitle": "Update the branch name.",
+      "fields": {
+        "name": "Name",
+        "namePlaceholder": "e.g. Main branch"
+      }
+    },
+    "validation": {
+      "nameRequired": "Name is required.",
+      "nameMax": "Name must be at most {max} characters.",
+      "noChanges": "No changes to save."
+    },
+    "delete": {
+      "title": "Delete branch",
+      "description": "You are about to delete {name}. This action cannot be undone.",
+      "confirm": "Delete"
+    },
+    "pagination": {
+      "loadMore": "Load more",
+      "moreAvailable": "More results available.",
+      "end": "End of results."
+    },
+    "success": {
+      "created": "Branch created",
+      "updated": "Branch updated",
+      "deleted": "Branch deleted"
+    }
+  },
   "ImportExport": {
     "import": {
       "title": "Import products",
@@ -399,7 +533,8 @@
         "created": "Created",
         "updated": "Updated",
         "failed": "Failed"
-      }
+      },
+      "success": "Import completed."
     },
     "export": {
       "title": "Export products",
@@ -414,7 +549,8 @@
       "customPlaceholder": "key (e.g. color)",
       "customHint": "Exported as attr_[key].",
       "customInvalid": "Key is not valid.",
-      "columnsRequired": "Select at least one column."
+      "columnsRequired": "Select at least one column.",
+      "success": "Download started."
     }
   }
 }

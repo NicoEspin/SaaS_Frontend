@@ -1,8 +1,9 @@
 "use client";
 
-import { Download, Plus, SlidersHorizontal, Upload } from "lucide-react";
+import { Download, Loader2, Plus, SlidersHorizontal, Upload } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 import { AttributeDefinitionsManager } from "@/components/products/AttributeDefinitionsManager";
 import { ConfirmDialog } from "@/components/products/ConfirmDialog";
@@ -17,6 +18,7 @@ import type { Product, ProductsListQuery } from "@/lib/products/types";
 import { useAttributeDefinitions } from "@/lib/products/hooks/use-attribute-definitions";
 import { useProductMutations } from "@/lib/products/hooks/use-product-mutations";
 import { useProductsList } from "@/lib/products/hooks/use-products-list";
+import { getAxiosErrorMessage } from "@/lib/products/utils";
 
 const EMPTY_UI_FILTERS: ProductsUiFilters = {
   q: "",
@@ -69,6 +71,15 @@ export function ProductsClient() {
 
   const exportDefinitions = useMemo(() => defs.items, [defs.items]);
 
+  const hasActiveFilters = Boolean(
+    appliedFilters.q ||
+      appliedFilters.code ||
+      appliedFilters.name ||
+      appliedFilters.categoryId ||
+      appliedFilters.categoryName ||
+      typeof appliedFilters.isActive === "boolean"
+  );
+
   function applyFilters() {
     const next = uiToQueryFilters(uiFilters);
     setAppliedFilters(next);
@@ -99,38 +110,39 @@ export function ProductsClient() {
     if (!deleteTarget) return;
     try {
       await deleteMut.deleteProduct(deleteTarget.id);
+      toast.success(t("success.deleted"));
       setDeleteTarget(null);
       await list.refresh();
-    } catch {
-      // error is shown in dialog via deleteMut.error
+    } catch (err) {
+      toast.error(getAxiosErrorMessage(err) ?? tc("errors.generic"));
     }
   }
 
   return (
     <section className="space-y-6">
       <div className="flex flex-wrap items-center justify-end gap-2">
-          <Button variant="outline" onClick={() => setAttrOpen(true)}>
-            <SlidersHorizontal className="h-4 w-4" />
-            {t("actions.manageAttributes")}
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => {
-              setExportKey((k) => k + 1);
-              setExportOpen(true);
-            }}
-          >
-            <Download className="h-4 w-4" />
-            {t("actions.export")}
-          </Button>
-          <Button variant="outline" onClick={() => setImportOpen(true)}>
-            <Upload className="h-4 w-4" />
-            {t("actions.import")}
-          </Button>
-          <Button onClick={openCreate}>
-            <Plus className="h-4 w-4" />
-            {t("actions.new")}
-          </Button>
+        <Button variant="outline" onClick={() => setAttrOpen(true)}>
+          <SlidersHorizontal className="h-4 w-4" />
+          {t("actions.manageAttributes")}
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => {
+            setExportKey((k) => k + 1);
+            setExportOpen(true);
+          }}
+        >
+          <Download className="h-4 w-4" />
+          {t("actions.export")}
+        </Button>
+        <Button variant="outline" onClick={() => setImportOpen(true)}>
+          <Upload className="h-4 w-4" />
+          {t("actions.import")}
+        </Button>
+        <Button onClick={openCreate}>
+          <Plus className="h-4 w-4" />
+          {t("actions.new")}
+        </Button>
       </div>
 
       <ProductFilters
@@ -148,6 +160,9 @@ export function ProductsClient() {
         dynamicColumns={dynamicColumns}
         onEdit={openEdit}
         onDelete={(p) => setDeleteTarget(p)}
+        hasFilters={hasActiveFilters}
+        onClearFilters={resetFilters}
+        onCreate={openCreate}
       />
 
       <div className="flex items-center justify-between">
@@ -159,12 +174,13 @@ export function ProductsClient() {
           onClick={() => void list.loadMore()}
           disabled={!list.canLoadMore}
         >
+          {list.loadingMore ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
           {list.loadingMore ? tc("actions.loading") : t("pagination.loadMore")}
         </Button>
       </div>
 
       <ProductForm
-        key={formKey}
+        key={`product-form-${formKey}`}
         open={formOpen}
         onOpenChange={setFormOpen}
         mode={formMode}
@@ -181,7 +197,7 @@ export function ProductsClient() {
       />
 
       <ExportProductsDialog
-        key={exportKey}
+        key={`export-products-${exportKey}`}
         open={exportOpen}
         onOpenChange={setExportOpen}
         filters={appliedFilters}

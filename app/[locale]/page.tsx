@@ -9,5 +9,5 @@ type Props = {
 export default async function LocaleIndexPage({ params }: Props) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
-  redirect(`/${locale}/dashboard`);
+  redirect(`/dashboard/${locale}`);
 }

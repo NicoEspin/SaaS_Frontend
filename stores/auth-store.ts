@@ -4,6 +4,8 @@ import { create } from "zustand";
 import type { AxiosError } from "axios";
 
 import { apiClient } from "@/lib/api-client";
+import type { AuthSession } from "@/lib/auth/session";
+import { authSessionApi } from "@/lib/auth/session-api";
 import { getLoginPathForPathname } from "@/lib/routes";
 
 export type LoginDto = {
@@ -33,8 +35,18 @@ type LogoutOptions = {
   reason?: "expired" | "manual";
 };
 
+export type SessionError = {
+  kind: "generic" | "unauthorized" | "invalid";
+};
+
 type AuthState = {
-  logout: (options?: LogoutOptions) => void;
+  session: AuthSession | null;
+  sessionLoading: boolean;
+  sessionError: SessionError | null;
+
+  hydrateSession: () => Promise<AuthSession>;
+
+  logout: (options?: LogoutOptions) => Promise<void>;
 
   login: (dto: LoginDto) => Promise<LoginResponse>;
   onboardingInitial: (
@@ -56,8 +68,52 @@ export function isAxiosError(error: unknown): error is AxiosError {
   return typeof error === "object" && error !== null && "isAxiosError" in error;
 }
 
-export const useAuthStore = create<AuthState>()(() => ({
+let hydratePromise: Promise<AuthSession> | null = null;
+
+export const useAuthStore = create<AuthState>()((set, get) => ({
+  session: null,
+  sessionLoading: false,
+  sessionError: null,
+
+  hydrateSession: async () => {
+    if (hydratePromise) return hydratePromise;
+
+    set({ sessionLoading: true, sessionError: null });
+    hydratePromise = authSessionApi
+      .get()
+      .then((session) => {
+        set({ session, sessionLoading: false, sessionError: null });
+        return session;
+      })
+      .catch((err: unknown) => {
+        const status =
+          isAxiosError(err) && typeof err.response?.status === "number"
+            ? err.response.status
+            : null;
+
+        set({
+          session: null,
+          sessionLoading: false,
+          sessionError:
+            status === 401
+              ? { kind: "unauthorized" }
+              : err instanceof Error && err.message.includes("Invalid auth session")
+                ? { kind: "invalid" }
+                : { kind: "generic" },
+        });
+
+        throw err;
+      })
+      .finally(() => {
+        hydratePromise = null;
+      });
+
+    return hydratePromise;
+  },
+
   logout: async (options) => {
+    set({ session: null, sessionError: null, sessionLoading: false });
+
     try {
       await apiClient.post("/auth/logout");
     } catch {
@@ -68,6 +124,11 @@ export const useAuthStore = create<AuthState>()(() => ({
 
   login: async (dto) => {
     await apiClient.post("/auth/login", dto);
+    try {
+      await get().hydrateSession();
+    } catch {
+      // best-effort: route is still protected by cookies
+    }
     return { ok: true };
   },
 
@@ -76,6 +137,11 @@ export const useAuthStore = create<AuthState>()(() => ({
       "/onboarding/initial",
       dto,
     );
+    try {
+      await get().hydrateSession();
+    } catch {
+      // best-effort
+    }
     return res.data;
   },
 }));

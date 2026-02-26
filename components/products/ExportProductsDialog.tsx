@@ -1,7 +1,9 @@
 "use client";
 
+import { Loader2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -107,6 +109,7 @@ export function ExportProductsDialog({
         filters,
         fallbackFilename: buildDefaultFilename(format),
       });
+      toast.success(t("export.success"));
     } catch {
       // error shown in UI
     }
@@ -224,6 +227,7 @@ export function ExportProductsDialog({
             {tc("actions.close")}
           </Button>
           <Button onClick={onExport} disabled={exportHook.loading}>
+            {exportHook.loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
             {exportHook.loading ? tc("actions.loading") : t("export.download")}
           </Button>
         </DialogFooter>

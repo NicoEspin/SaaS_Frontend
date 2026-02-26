@@ -42,7 +42,8 @@ export function useAttributeDefinitions(categoryId: string | null) {
     }));
 
     try {
-      const items = await productsApi.attributeDefinitions.listByCategory(id);
+      const data = await productsApi.attributeDefinitions.listByCategory(id);
+      const items = Array.isArray(data) ? data : [];
       setState({ categoryId: id, items, loading: false, error: null });
     } catch (err) {
       setState({
@@ -105,7 +106,10 @@ export function useAttributeDefinitions(categoryId: string | null) {
     setState((s) => ({ ...s, items: s.items.filter((it) => it.id !== id) }));
   }, []);
 
-  const items = useMemo(() => (matches ? state.items : []), [matches, state.items]);
+  const items = useMemo(() => {
+    if (!matches) return [];
+    return Array.isArray(state.items) ? state.items : [];
+  }, [matches, state.items]);
   const loading = matches ? state.loading : false;
   const error = matches ? state.error : null;
 

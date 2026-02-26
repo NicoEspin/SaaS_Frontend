@@ -10,24 +10,91 @@ This is the Next.js frontend (App Router). Follow these rules strictly.
 - Typecheck: `npm typecheck`
 - Tests (if present): `npm test`
 
-Definition of Done:
+## Definition of Done
 
 1. No TypeScript errors (must pass `npm typecheck`)
 2. No ESLint errors (must pass `npm lint`)
-3. UI matches design intent, responsive, accessible
+3. UI is visually polished — passes the full audit in `skills/ui-visual-polish/SKILL.md`
 4. Uses design tokens (CSS variables) — no hardcoded theme colors
 5. All user-facing text is translated via `next-intl` (no hardcoded strings)
-6. All UI uses shadcn/ui components — no raw HTML for interactive elements or layout primitives
+6. All UI uses shadcn/ui components — no raw HTML for interactive elements
+7. Responsive: works at 1280px (desktop) and 768px (tablet)
+
+---
+
+## ⚠️ Visual Quality — Non-Negotiable Rules
+
+> Before writing a single line of UI code, read `skills/ui-visual-polish/SKILL.md`.
+> These rules are not suggestions. Violating them means the task is not done.
+
+### The 5 Hard Rules
+
+**1. Destructive actions are always red.**
+Delete, remove, revoke, disconnect, or any irreversible cancel → `variant="destructive"`.
+Never use a default or outline button for these. Never hardcode `bg-red-*`.
+
+```tsx
+// ❌ Wrong
+<Button onClick={handleDelete}>Delete</Button>
+
+// ✅ Always
+<Button variant="destructive">
+  <Trash2 className="mr-2 h-4 w-4" />
+  {t('Common.delete')}
+</Button>
+```
+
+Irreversible deletions require an `<AlertDialog>` for confirmation — never a `window.confirm()` or inline prompt.
+
+**2. Every page has one clear primary action using `bg-primary`.**
+The most important CTA uses `<Button>` (default variant = primary). There is exactly one per view.
+Supporting actions use `variant="outline"` or `variant="ghost"`.
+
+**3. Status always uses semantic `<Badge>` with color-coded className.**
+Never use `<span>` or raw `<div>` for status indicators.
+Active = emerald, Pending = amber, Error/Danger = red, Draft = blue, Inactive = zinc.
+
+**4. All interactive elements have hover + focus states.**
+
+- Table rows: `hover:bg-muted/50 transition-colors cursor-pointer`
+- Clickable cards: `hover:shadow-md hover:border-primary/40 transition-all`
+- Nav links: `hover:bg-muted hover:text-foreground` vs `bg-primary/10 text-primary` when active
+- Never remove `focus-visible` rings
+
+**5. Loading and empty states are designed screens, not afterthoughts.**
+
+- Content loading → `<Skeleton>` components, never a full-page spinner
+- Buttons submitting → spinner icon + contextual text (`"Saving..."`, `"Deleting..."`)
+- No data → `<EmptyState>` with icon (dashed circle), title, description, optional CTA
+- No search results → different `<EmptyState>` with SearchX icon + clear filters action
+
+---
+
+## Visual Audit (Run Before Every Commit)
+
+| Check                                                           | Fix                                       |
+| --------------------------------------------------------------- | ----------------------------------------- |
+| Destructive actions use `variant="destructive"`?                | Change variant                            |
+| Primary CTA uses default `<Button>` (primary color)?            | Remove color overrides                    |
+| Status uses `<Badge>` with semantic color className?            | Replace `<span>` → `<StatusBadge />`      |
+| Supporting text uses `text-muted-foreground`?                   | Add the class                             |
+| Table rows have hover state?                                    | Add `hover:bg-muted/50 transition-colors` |
+| Buttons in loading show spinner + changed label?                | Add `isPending` state to button           |
+| Loading content uses `<Skeleton>` not global spinner?           | Build skeleton for that view              |
+| Empty views have `<EmptyState>` with icon + text + action?      | Implement component                       |
+| Icon-only buttons have `<Tooltip>`?                             | Wrap in `<Tooltip>`                       |
+| User actions show `toast.success()` / `toast.error()` feedback? | Add toast calls                           |
 
 ---
 
 ## Tech constraints
 
 - Next.js (App Router)
-- TypeScript (strict mindset: no `any`)
+- TypeScript (strict: no `any`)
 - TailwindCSS
-- shadcn/ui components only (from `@/components/ui/*`)
+- shadcn/ui only (from `@/components/ui/*`)
 - next-intl for i18n (required)
+- `lucide-react` for icons
 
 Do NOT introduce new UI libraries without explicit instruction.
 
@@ -39,33 +106,33 @@ Do NOT introduce new UI libraries without explicit instruction.
 
 **Every UI primitive must come from shadcn/ui.** Never use raw `<button>`, `<input>`,
 `<select>`, `<textarea>`, `<table>`, custom modals, or custom toggle/switch HTML.
-Always use the shadcn equivalent.
 
 ### Before using any component
 
-1. Check `components.json` exists in the project root — confirms shadcn is initialised.
-2. Check the component file exists at `components/ui/<name>.tsx`.
-3. If it does NOT exist → install it:
-   ```bash
-   npx shadcn@latest add <component-name>
-   ```
+1. Check `components.json` exists in the project root.
+2. Check the component exists at `components/ui/<name>.tsx`.
+3. If it does NOT exist → install it: `npx shadcn@latest add <component-name>`
 4. Never hand-write shadcn component files. Always use the CLI.
 
 ### API differences (critical — will cause TS errors if wrong)
 
-| Component  | ❌ Wrong (native)         | ✅ Correct (shadcn)                       |
-|------------|--------------------------|-------------------------------------------|
-| `Switch`   | `onChange(e)`            | `onCheckedChange(checked: boolean)`       |
-| `Select`   | `onChange(e.target.val)` | `onValueChange(value: string)`            |
-| `Checkbox` | `onChange(e)`            | `onCheckedChange(checked: boolean)`       |
-| `Dialog`   | `isOpen`                 | `open` + `onOpenChange(open: boolean)`    |
+| Component  | ❌ Wrong (native)        | ✅ Correct (shadcn)                    |
+| ---------- | ------------------------ | -------------------------------------- |
+| `Switch`   | `onChange(e)`            | `onCheckedChange(checked: boolean)`    |
+| `Select`   | `onChange(e.target.val)` | `onValueChange(value: string)`         |
+| `Checkbox` | `onChange(e)`            | `onCheckedChange(checked: boolean)`    |
+| `Dialog`   | `isOpen`                 | `open` + `onOpenChange(open: boolean)` |
 
 ### shadcn Select — mandatory pattern
 
-shadcn `Select` is Radix-based, not a native `<select>`. Always use:
-
 ```tsx
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 
 <Select value={value} onValueChange={setValue}>
   <SelectTrigger>
@@ -74,43 +141,33 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
   <SelectContent>
     <SelectItem value="TEXT">Text</SelectItem>
   </SelectContent>
-</Select>
+</Select>;
 ```
 
 ### shadcn Switch — mandatory pattern
 
-shadcn `Switch` has NO `label` prop and NO `onChange`. Always pair with `<Label>`:
-
 ```tsx
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
-
 <div className="flex items-center gap-2">
   <Switch id="sw" checked={checked} onCheckedChange={setChecked} />
-  <Label htmlFor="sw">Label text</Label>
+  <Label htmlFor="sw">{t("Forms.switchLabel")}</Label>
 </div>
 ```
 
 ### Migration map: native → shadcn
 
-| Replace…                   | …with                                         |
-|----------------------------|-----------------------------------------------|
-| `<button>`                 | `<Button>`                                    |
-| `<input>`                  | `<Input>`                                     |
-| `<label>`                  | `<Label>`                                     |
-| `<select>` + `<option>`    | `<Select>` + `<SelectTrigger/Content/Item>`   |
-| `<textarea>`               | `<Textarea>`                                  |
-| `<table>` raw              | `<Table>` + sub-components                    |
-| Custom modal/overlay       | `<Dialog>`                                    |
-| Custom toggle/switch       | `<Switch>` + `<Label>`                        |
-| `<div role="alert">`       | `<Alert>` + `<AlertDescription>`             |
-| Custom skeleton divs       | `<Skeleton>`                                  |
-| Custom badge `<span>`      | `<Badge>`                                     |
-
-### Skill reference
-
-→ **Always read `skills/shadcn-ui/SKILL.md`** before adding, modifying, or refactoring
-any component that touches the UI layer.
+| Replace…                | …with                                       |
+| ----------------------- | ------------------------------------------- |
+| `<button>`              | `<Button>`                                  |
+| `<input>`               | `<Input>`                                   |
+| `<label>`               | `<Label>`                                   |
+| `<select>` + `<option>` | `<Select>` + `<SelectTrigger/Content/Item>` |
+| `<textarea>`            | `<Textarea>`                                |
+| `<table>` raw           | `<Table>` + sub-components                  |
+| Custom modal/overlay    | `<Dialog>` or `<AlertDialog>`               |
+| Custom toggle/switch    | `<Switch>` + `<Label>`                      |
+| `<div role="alert">`    | `<Alert>` + `<AlertDescription>`            |
+| Custom skeleton divs    | `<Skeleton>`                                |
+| Custom badge `<span>`   | `<Badge>`                                   |
 
 ---
 
@@ -119,151 +176,108 @@ any component that touches the UI layer.
 ### Hard rules
 
 - All user-facing strings must come from `next-intl`:
-  - Use `useTranslations()` in Client Components
-  - Use `getTranslations()` in Server Components
-- Do not ship hardcoded UI text in components/pages.
-- Keys must be stable and consistent. Prefer namespaced keys:
-  - `Nav.*`, `Auth.*`, `Common.*`, `Errors.*`, `Forms.*`, `Dashboard.*`, `Products.*`, `Attributes.*`, `Pages.*`
-
-### Locale strategy
-
-- Use a locale segment strategy: `app/[locale]/...`
-- Keep routing and links locale-aware.
-- Provide a default locale and supported locales list in a single source of truth.
+  - `useTranslations()` in Client Components
+  - `getTranslations()` in Server Components
+- No hardcoded UI text anywhere in components or pages.
+- Namespaced keys: `Nav.*`, `Auth.*`, `Common.*`, `Errors.*`, `Forms.*`, `Dashboard.*`, `Products.*`, `Attributes.*`, `Pages.*`, `Status.*`
 
 ### Translation files
 
-- Store dictionaries in `messages/en.json`, `messages/es.json`, etc.
-- Avoid duplicate keys; keep keys short but descriptive.
-- When adding new UI, always add keys in **all** supported locales in the same change.
+- Store in `messages/en.json`, `messages/es.json`, etc.
+- When adding new UI, add keys in **all** supported locales in the same change.
 
-### Type-safety
+### Locale strategy
 
-- Prefer typed message keys where possible.
-- Do not cast translation results to force types. Fix the source.
+- Route segment: `app/[locale]/...`
+- Keep all routing and links locale-aware.
 
 ---
 
 ## Design system & theming (MANDATORY)
 
-### Primary brand color
+### Semantic token usage
 
-Primary brand is a deep navy based on Tailwind `blue-900` (#1e3a8a), BUT:
+✅ Always use semantic tokens:
 
-✅ Use semantic tokens:
-
-- `bg-primary`, `text-primary-foreground`, `border-border`, `bg-background`, etc.
-- Tokens must map to CSS variables (`--primary`, `--background`, etc.)
-- Dark/Light mode must be switchable by swapping variables (e.g. `.dark` class)
+- `bg-primary`, `text-primary-foreground`
+- `bg-destructive`, `text-destructive`
+- `bg-muted`, `text-muted-foreground`
+- `bg-card`, `border-border`, `bg-background`
 
 ❌ Never hardcode:
 
-- `bg-blue-900`, `text-blue-900`, `#1e3a8a` directly in components
+- `bg-blue-900`, `text-blue-900`, `#1e3a8a` in components
   (only allowed in token definitions in `app/globals.css`)
 
-### How to implement tokens
+### Semantic color reference
 
-- Define tokens in `app/globals.css` using `:root` and `.dark`
-- Tailwind config must map colors to `hsl(var(--token))` (shadcn convention)
+| Intent            | Token / Tailwind class                                                            |
+| ----------------- | --------------------------------------------------------------------------------- |
+| Primary action    | `bg-primary text-primary-foreground`                                              |
+| Destructive       | `bg-destructive text-destructive-foreground` / `text-destructive`                 |
+| Success / Active  | `text-emerald-600 dark:text-emerald-400` + `bg-emerald-50 dark:bg-emerald-950/30` |
+| Warning / Pending | `text-amber-600 dark:text-amber-400` + `bg-amber-50 dark:bg-amber-950/30`         |
+| Info              | `text-blue-600 dark:text-blue-400` + `bg-blue-50 dark:bg-blue-950/30`             |
+| Secondary text    | `text-muted-foreground`                                                           |
 
-### UI decisions
+### Implementing tokens
 
-- Use shadcn primitives (Button, Card, Dialog, Sheet, DropdownMenu, Tabs, Table, etc.)
-- For variants, prefer `cva` patterns already used by shadcn components
-- Use `cn()` helper for className composition (no manual string concatenation)
+- Define in `app/globals.css` using `:root` and `.dark`
+- Tailwind config maps to `hsl(var(--token))` (shadcn convention)
+- `cn()` helper for className composition — no manual string concatenation
 
 ---
 
 ## TypeScript rules (ZERO type issues)
 
-### Hard rules
-
 - No `any`, no `unknown` without narrowing, no `as SomeType` unless justified
-- Props must be typed (explicit types or inferred from generics)
-- Prefer:
-  - `type Props = { ... }`
-  - `ComponentPropsWithoutRef<"button">`
-  - `z.infer<typeof Schema>` for validated data shapes
-  - `satisfies` for object literals to keep inference correct
-
-### Data boundaries
-
-Any data coming from Route Handlers, External APIs, localStorage, or searchParams
-must be validated/normalized at the boundary (Zod recommended), then typed downstream.
-
-If a component consumes API data:
-- Create a typed adapter (normalize shape once)
-- Never scatter optional chaining everywhere to "fix" types
+- Props must be explicitly typed
+- Use `z.infer<typeof Schema>` for validated data
+- Data from APIs, Route Handlers, localStorage, or searchParams must be validated at the boundary (Zod)
+- Never scatter optional chaining to silence type errors — fix the root type
 
 ---
 
 ## Next.js best practices (App Router)
 
-- Default to Server Components; add `'use client'` only when needed.
-- Keep data fetching on the server when possible.
-- Prevent waterfalls: fetch in parallel, use Suspense/streaming if it helps.
-- Use `error.tsx`, `loading.tsx`, `not-found.tsx` per route when appropriate.
+- Default to Server Components; `'use client'` only when needed
+- Fetch data on the server when possible
+- Parallel fetching to prevent waterfalls
+- `error.tsx`, `loading.tsx`, `not-found.tsx` per route when appropriate
 
 ---
 
-## Accessibility & UX (required)
+## Accessibility (required)
 
-- All interactive elements must be keyboard accessible
-- Visible focus states (don't remove outlines unless replaced properly)
-- Forms: proper labels, `aria-*` attributes where relevant
-- Use semantic HTML first, then enhance with shadcn components
-
----
-
-## Folder expectations
-
-- `app/` routes + layouts
-- `app/[locale]/` locale segment routes
-- `components/` shared components
-- `components/ui/` shadcn components (CLI-managed — do NOT hand-edit unless customising)
-- `components/products/` product domain components
-- `lib/` utilities (`cn`, formatters, validators, fetchers, i18n helpers)
-- `messages/` translation dictionaries (`en.json`, `es.json`, …)
-- `skills/` agent skill files
+- All interactive elements keyboard-accessible
+- Visible focus states (never remove `focus-visible` rings without replacing)
+- Forms: proper `<Label>` associations, `aria-invalid`, `aria-describedby`
+- Icon-only buttons: `aria-label` + `<Tooltip>`
 
 ---
 
-## Skills usage (when to use them)
+## Folder structure
 
-Read the relevant `SKILL.md` **before** writing any code for that domain.
-
-| Skill                    | File                              | Use when…                                                        |
-|--------------------------|-----------------------------------|------------------------------------------------------------------|
-| `shadcn-ui`              | `skills/shadcn-ui/SKILL.md`       | Adding/replacing any UI component; installing shadcn components  |
-| `next-best-practices`    | *(if present)*                    | Creating/modifying routes, layouts, metadata, fetch patterns     |
-| `ui-ux-pro-max`          | *(if present)*                    | Designing new pages/sections, layout, typography, empty states   |
-| `zustand-state-management` | *(if present)*                  | Adding shared client-side state, persist/devtools, hydration     |
-
-If design system docs exist (e.g. `design-system/MASTER.md`), treat them as source of truth.
+```
+app/                        routes + layouts
+app/[locale]/               locale segment routes
+components/                 shared components
+components/ui/              shadcn components (CLI-managed — do not hand-edit)
+lib/                        utilities (cn, formatters, validators, fetchers)
+messages/                   translation dictionaries (en.json, es.json, …)
+skills/                     agent skill files
+```
 
 ---
 
-## Products page — known component inventory
+## Skills — Read Before Coding
 
-The following components exist under `components/products/` and must be kept in sync
-with shadcn conventions when modified:
+| Skill                      | File                               | Use when…                                        |
+| -------------------------- | ---------------------------------- | ------------------------------------------------ |
+| **`ui-visual-polish`**     | `skills/ui-visual-polish/SKILL.md` | **Every UI task** — read this first, always      |
+| `shadcn-ui`                | `skills/shadcn-ui/SKILL.md`        | Adding/replacing/installing any shadcn component |
+| `next-best-practices`      | _(if present)_                     | Routes, layouts, metadata, fetch patterns        |
+| `zustand-state-management` | _(if present)_                     | Shared client-side state, persist, devtools      |
 
-- `ProductsClient` — main client orchestrator (filters, table, dialogs, pagination)
-- `ProductTable` — data table using `<Table>` shadcn primitives + `<Badge>`, `<Button>`, `<Skeleton>`
-- `ProductFilters` — filter bar using `<Input>`, `<Select>`, `<Button>`
-- `ProductForm` — create/edit form inside `<Dialog>`
-- `AttributeDefinitionsManager` — attribute CRUD inside `<Dialog>` with `<Table>`, `<Select>`, `<Switch>`, `<Input>`, `<Textarea>`, `<Label>`
-- `ConfirmDialog` — destructive confirm using `<Dialog>`
-- `ImportProductsDialog` — import flow using `<Dialog>`
-- `ExportProductsDialog` — export flow using `<Dialog>`
+> `ui-visual-polish` is the **first skill to read on any UI task**. No exceptions.
 
-### Known shadcn API issues to watch in this codebase
-
-1. `AttributeDefinitionsManager` currently uses a **native `<select>`** pattern for the
-   type selector and **`onChange` + `label` prop on `<Switch>`** — these must be migrated
-   to the correct shadcn `<Select>` and `<Switch>` + `<Label>` APIs.
-
-2. Any `<div role="alert">` for inline errors should be replaced with
-   `<Alert><AlertDescription>...</AlertDescription></Alert>`.
-
-3. Always run `npx shadcn@latest add alert` if `<Alert>` is not yet installed.

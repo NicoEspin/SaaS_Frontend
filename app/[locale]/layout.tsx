@@ -7,6 +7,8 @@ import { getMessages, setRequestLocale } from "next-intl/server";
 import "../globals.css";
 
 import ThemeClassSync from "@/components/theme/ThemeClassSync";
+import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { isLocale, locales } from "@/i18n/locales";
 
 const geistSans = Geist({
@@ -44,8 +46,11 @@ export default async function LocaleLayout({ children, params }: Props) {
     <html lang={locale} suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <NextIntlClientProvider messages={messages}>
-          <ThemeClassSync />
-          {children}
+          <TooltipProvider delayDuration={200}>
+            <ThemeClassSync />
+            <Toaster />
+            {children}
+          </TooltipProvider>
         </NextIntlClientProvider>
       </body>
     </html>

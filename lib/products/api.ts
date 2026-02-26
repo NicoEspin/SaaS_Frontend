@@ -57,11 +57,18 @@ export const productsApi = {
     },
 
     async listByCategory(categoryId: string) {
-      const res = await apiClient.get<ProductAttributeDefinition[]>(
+      const res = await apiClient.get<unknown>(
         "/products/attribute-definitions",
         { params: { categoryId } }
       );
-      return res.data;
+
+      const data = res.data;
+      if (Array.isArray(data)) return data as ProductAttributeDefinition[];
+      if (data && typeof data === "object") {
+        const maybeItems = (data as { items?: unknown }).items;
+        if (Array.isArray(maybeItems)) return maybeItems as ProductAttributeDefinition[];
+      }
+      return [];
     },
 
     async update(id: string, dto: ProductAttributeDefinitionUpdateDto) {

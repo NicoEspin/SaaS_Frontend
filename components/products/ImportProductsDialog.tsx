@@ -1,8 +1,10 @@
 "use client";
 
 import axios from "axios";
+import { Loader2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -76,6 +78,7 @@ export function ImportProductsDialog({ open, onOpenChange, onImported }: Props) 
     if (!previewId) return;
     try {
       await confirmHook.confirm(previewId);
+      toast.success(t("import.success"));
       onImported();
     } catch (err) {
       const status = axios.isAxiosError(err) ? err.response?.status ?? null : null;
@@ -143,9 +146,11 @@ export function ImportProductsDialog({ open, onOpenChange, onImported }: Props) 
 
               <div className="flex items-center gap-2">
                 <Button variant="outline" disabled={!canPreview} onClick={runPreview}>
+                  {previewHook.loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                   {previewHook.loading ? tc("actions.loading") : t("import.preview")}
                 </Button>
                 <Button disabled={!canConfirm} onClick={runConfirm}>
+                  {confirmHook.loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                   {confirmHook.loading ? tc("actions.loading") : t("import.confirm")}
                 </Button>
               </div>

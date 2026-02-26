@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link, useRouter } from "@/i18n/navigation";
+import { stripLocaleFromPathname } from "@/lib/routes";
 import { isValidEmail, isValidPassword } from "@/lib/validators";
 import { isAxiosError, useAuthStore } from "@/stores/auth-store";
 
@@ -38,7 +39,11 @@ export default function LoginClient() {
   const next = useMemo(() => {
     const raw = searchParams.get("next");
     if (!raw) return null;
-    return raw.startsWith("/") ? raw : null;
+    if (!raw.startsWith("/") || raw.startsWith("//")) return null;
+
+    const url = new URL(raw, "http://local");
+    const pathname = stripLocaleFromPathname(url.pathname);
+    return `${pathname}${url.search}${url.hash}`;
   }, [searchParams]);
 
   // If user is already authenticated, middleware redirects away from this page.

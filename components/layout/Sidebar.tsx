@@ -2,12 +2,14 @@
 
 import type { ComponentType } from "react";
 
-import { BarChart3, Boxes, LayoutGrid, Package, Settings } from "lucide-react";
+import { BarChart3, Boxes, Building2, LayoutGrid, Package, Settings } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { Link, usePathname } from "@/i18n/navigation";
-import { isLocale } from "@/i18n/locales";
+import { stripLocaleFromPathname } from "@/lib/routes";
 import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/stores/auth-store";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type NavItem = {
   href: string;
@@ -19,23 +21,24 @@ type Props = {
   collapsed: boolean;
 };
 
-function stripLocale(pathname: string) {
-  const parts = pathname.split("/");
-  const maybeLocale = parts[1] ?? "";
-  if (isLocale(maybeLocale)) {
-    const rest = parts.slice(2).join("/");
-    return `/${rest}`;
-  }
-  return pathname;
-}
-
 export default function Sidebar({ collapsed }: Props) {
   const t = useTranslations("Nav");
   const pathname = usePathname();
-  const logicalPath = stripLocale(pathname);
+  const logicalPath = stripLocaleFromPathname(pathname);
+
+  const session = useAuthStore((s) => s.session);
+  const sessionLoading = useAuthStore((s) => s.sessionLoading);
+  const tenantName = session?.tenant.name ?? null;
+  const role = session?.membership.role ?? null;
+  const canSeeBranches = role === "ADMIN" || role === "OWNER";
+
+  const brandTitle = tenantName ?? t("brand");
+  const brandSubtitle = tenantName ? t("brand") : "\u00A0";
+  const brandInitial = brandTitle.slice(0, 1).toUpperCase();
 
   const items: NavItem[] = [
     { href: "/dashboard", label: t("dashboard"), Icon: LayoutGrid },
+    ...(canSeeBranches ? [{ href: "/branches", label: t("branches"), Icon: Building2 }] : []),
     { href: "/inventory", label: t("inventory"), Icon: Boxes },
     { href: "/products", label: t("products"), Icon: Package },
     { href: "/reports", label: t("reports"), Icon: BarChart3 },
@@ -65,14 +68,16 @@ export default function Sidebar({ collapsed }: Props) {
           aria-label={t("brand")}
         >
           <div className="grid h-9 w-9 place-items-center rounded-lg bg-primary text-sm font-semibold text-primary-foreground">
-            {t("brand").slice(0, 1).toUpperCase()}
+            {brandInitial}
           </div>
           {!collapsed && (
             <div className="leading-tight">
               <div className="text-sm font-semibold tracking-wide text-foreground">
-                {t("brand")}
+                {sessionLoading ? <Skeleton className="h-4 w-40" /> : brandTitle}
               </div>
-              <div className="text-xs text-muted-foreground">&nbsp;</div>
+              <div className="text-xs text-muted-foreground">
+                {sessionLoading ? <Skeleton className="mt-1 h-3 w-20" /> : brandSubtitle}
+              </div>
             </div>
           )}
         </Link>

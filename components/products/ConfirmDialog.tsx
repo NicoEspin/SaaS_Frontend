@@ -1,16 +1,19 @@
 "use client";
 
+import { Loader2 } from "lucide-react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 
-import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type Props = {
   open: boolean;
@@ -21,7 +24,7 @@ type Props = {
   cancelLabel?: string;
   destructive?: boolean;
   loading?: boolean;
-  onConfirm: () => void;
+  onConfirm: () => Promise<void> | void;
 };
 
 export function ConfirmDialog({
@@ -37,32 +40,51 @@ export function ConfirmDialog({
 }: Props) {
   const t = useTranslations("Common");
 
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          {description ? <DialogDescription>{description}</DialogDescription> : null}
-        </DialogHeader>
+  const [internalPending, setInternalPending] = useState(false);
+  const pending = Boolean(loading) || internalPending;
 
-        <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            disabled={loading}
-          >
+  async function handleConfirm() {
+    setInternalPending(true);
+    try {
+      await onConfirm();
+    } finally {
+      setInternalPending(false);
+    }
+  }
+
+  return (
+    <AlertDialog
+      open={open}
+      onOpenChange={(next) => {
+        if (!next && pending) return;
+        onOpenChange(next);
+      }}
+    >
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{title}</AlertDialogTitle>
+          {description ? (
+            <AlertDialogDescription>{description}</AlertDialogDescription>
+          ) : null}
+        </AlertDialogHeader>
+
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={pending}>
             {cancelLabel ?? t("actions.cancel")}
-          </Button>
-          <Button
-            variant={destructive ? "secondary" : "default"}
-            onClick={onConfirm}
-            disabled={loading}
-            className={destructive ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" : undefined}
+          </AlertDialogCancel>
+          <AlertDialogAction
+            variant={destructive ? "destructive" : "default"}
+            disabled={pending}
+            onClick={(e) => {
+              e.preventDefault();
+              void handleConfirm();
+            }}
           >
-            {loading ? t("actions.loading") : confirmLabel ?? t("actions.confirm")}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+            {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+            {pending ? t("actions.loading") : confirmLabel ?? t("actions.confirm")}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

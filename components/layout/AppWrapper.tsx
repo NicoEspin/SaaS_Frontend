@@ -1,10 +1,11 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import Navbar from "@/components/layout/Navbar";
 import Sidebar from "@/components/layout/Sidebar";
+import { useAuthStore } from "@/stores/auth-store";
 
 type Props = {
   children: ReactNode;
@@ -12,6 +13,15 @@ type Props = {
 
 export default function AppWrapper({ children }: Props) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  const session = useAuthStore((s) => s.session);
+  const sessionLoading = useAuthStore((s) => s.sessionLoading);
+  const hydrateSession = useAuthStore((s) => s.hydrateSession);
+
+  useEffect(() => {
+    if (session || sessionLoading) return;
+    void hydrateSession();
+  }, [hydrateSession, session, sessionLoading]);
 
   return (
     <div className="relative min-h-dvh bg-background text-foreground">

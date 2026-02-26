@@ -2,6 +2,7 @@
   "Nav": {
     "brand": "Stock",
     "dashboard": "Dashboard",
+    "branches": "Sucursales",
     "inventory": "Inventario",
     "products": "Productos",
     "reports": "Reportes",
@@ -11,7 +12,9 @@
     "collapseSidebar": "Colapsar sidebar",
     "expandSidebar": "Expandir sidebar",
     "themeToDark": "Cambiar a modo oscuro",
-    "themeToLight": "Cambiar a modo claro"
+    "themeToLight": "Cambiar a modo claro",
+    "activeBranchAria": "Sucursal activa: {branch}",
+    "userAria": "Sesion iniciada como {name}"
   },
   "Auth": {
     "common": {
@@ -93,8 +96,14 @@
   "Pages": {
     "dashboardTitle": "Dashboard",
     "dashboardSubtitle": "Resumen y acciones rapidas.",
+    "branchesTitle": "Sucursales",
+    "branchesSubtitle": "Crea, renombra y elimina sucursales.",
     "inventoryTitle": "Inventario",
     "inventorySubtitle": "Gestiona stock y ubicaciones.",
+    "inventory": {
+      "title": "Inventario",
+      "subtitle": "Gestion de stock por sucursal"
+    },
     "productsTitle": "Productos",
     "productsSubtitle": "Crea y actualiza tu catalogo.",
     "reportsTitle": "Reportes",
@@ -183,6 +192,54 @@
       "generic": "Algo salio mal. Intenta de nuevo."
     }
   },
+  "EmptyState": {
+    "noRecords": {
+      "title": "Todavia no hay registros",
+      "description": "Crea el primer item para empezar."
+    },
+    "noResults": {
+      "title": "Sin resultados",
+      "description": "Proba ajustando la busqueda o los filtros."
+    }
+  },
+  "Inventory": {
+    "title": "Inventario",
+    "subtitle": "Gestiona niveles de stock entre sucursales",
+    "activeBranchLabel": "Sucursal activa",
+    "selectBranch": "Selecciona una sucursal",
+    "noBranchSelected": "Selecciona una sucursal para ver el stock",
+    "emptyState": "No hay registros de stock para esta sucursal",
+    "actions": {
+      "refreshBranches": "Actualizar sucursales",
+      "refreshInventory": "Actualizar inventario"
+    },
+    "columns": {
+      "code": "Codigo",
+      "name": "Producto",
+      "category": "Categoria",
+      "stock": "Stock",
+      "price": "Precio",
+      "actions": "Acciones"
+    },
+    "adjust": "Ajustar",
+    "transfer": "Transferir",
+    "adjustDialog": {
+      "title": "Ajustar stock",
+      "quantity": "Cantidad (+ sumar / - restar)",
+      "notes": "Notas (opcional)",
+      "submit": "Aplicar ajuste"
+    },
+    "transferDialog": {
+      "title": "Transferir stock",
+      "toBranch": "Sucursal destino",
+      "quantity": "Cantidad",
+      "submit": "Transferir"
+    },
+    "success": {
+      "adjusted": "Stock ajustado",
+      "transferred": "Stock transferido"
+    }
+  },
   "Products": {
     "actions": {
       "new": "Nuevo producto",
@@ -194,6 +251,7 @@
     },
     "filters": {
       "title": "Filtros",
+      "activeCount": "{count} activos",
       "q": "Busqueda",
       "qPlaceholder": "SKU, nombre o atributo...",
       "code": "Codigo",
@@ -204,7 +262,8 @@
       "categoryIdPlaceholder": "ULID (opcional)",
       "categoryName": "Categoria",
       "categoryNamePlaceholder": "Nombre de categoria",
-      "isActive": "Estado"
+      "isActive": "Estado",
+      "advanced": "Mas filtros"
     },
     "fields": {
       "code": "Codigo",
@@ -215,6 +274,18 @@
       "isActive": "Activo",
       "updatedAt": "Actualizado",
       "attributes": "Atributos"
+    },
+    "initialStock": {
+      "toggle": "Definir stock inicial",
+      "subtitle": "Opcional. Completa sucursal, stock y precio.",
+      "disabledHint": "Activalo para precargar stock y precio por sucursal.",
+      "branch": "Sucursal",
+      "addBranch": "Agregar sucursal",
+      "remove": "Quitar",
+      "stockOnHand": "Stock disponible",
+      "price": "Precio",
+      "rowInvalid": "Completa sucursal, stock y precio.",
+      "rowsInvalid": "Revisa {count} filas de stock inicial."
     },
     "table": {
       "title": "Productos",
@@ -231,6 +302,11 @@
       "createSubtitle": "Completa los datos y guarda.",
       "editTitle": "Editar producto",
       "editSubtitle": "Actualiza los datos y guarda.",
+      "tabs": {
+        "details": "Detalles",
+        "attributes": "Atributos",
+        "stock": "Stock inicial"
+      },
       "sections": {
         "basicsTitle": "Datos principales",
         "basicsSubtitle": "Codigo, nombre y estado.",
@@ -254,6 +330,11 @@
     },
     "errors": {
       "codeConflict": "Ese codigo ya existe."
+    },
+    "success": {
+      "created": "Producto creado",
+      "updated": "Producto actualizado",
+      "deleted": "Producto eliminado"
     },
     "delete": {
       "title": "Eliminar producto",
@@ -362,6 +443,59 @@
       "noCategoryEmpty": "Selecciona una categoria para ver definiciones."
     }
   },
+  "Branches": {
+    "title": "Sucursales",
+    "subtitle": "Administra las sucursales de tu espacio.",
+    "actions": {
+      "new": "Nueva sucursal",
+      "delete": "Eliminar"
+    },
+    "filters": {
+      "q": "Busqueda",
+      "qPlaceholder": "Busca por nombre..."
+    },
+    "table": {
+      "title": "Sucursales",
+      "count": "{count} sucursales",
+      "empty": "No se encontraron sucursales.",
+      "columns": {
+        "name": "Nombre",
+        "id": "ID",
+        "createdAt": "Creada",
+        "updatedAt": "Actualizada"
+      }
+    },
+    "form": {
+      "createTitle": "Crear sucursal",
+      "createSubtitle": "Agrega una nueva sucursal a tu espacio.",
+      "editTitle": "Editar sucursal",
+      "editSubtitle": "Actualiza el nombre de la sucursal.",
+      "fields": {
+        "name": "Nombre",
+        "namePlaceholder": "Ej: Sucursal principal"
+      }
+    },
+    "validation": {
+      "nameRequired": "El nombre es obligatorio.",
+      "nameMax": "El nombre debe tener como maximo {max} caracteres.",
+      "noChanges": "No hay cambios para guardar."
+    },
+    "delete": {
+      "title": "Eliminar sucursal",
+      "description": "Vas a eliminar {name}. Esta accion no se puede deshacer.",
+      "confirm": "Eliminar"
+    },
+    "pagination": {
+      "loadMore": "Cargar mas",
+      "moreAvailable": "Hay mas resultados.",
+      "end": "Fin de resultados."
+    },
+    "success": {
+      "created": "Sucursal creada",
+      "updated": "Sucursal actualizada",
+      "deleted": "Sucursal eliminada"
+    }
+  },
   "ImportExport": {
     "import": {
       "title": "Importar productos",
@@ -399,7 +533,8 @@
         "created": "Creadas",
         "updated": "Actualizadas",
         "failed": "Fallidas"
-      }
+      },
+      "success": "Importacion completada."
     },
     "export": {
       "title": "Exportar productos",
@@ -414,7 +549,8 @@
       "customPlaceholder": "key (ej: color)",
       "customHint": "Se exporta como attr_[key].",
       "customInvalid": "La key no es valida.",
-      "columnsRequired": "Selecciona al menos una columna."
+      "columnsRequired": "Selecciona al menos una columna.",
+      "success": "Descarga iniciada."
     }
   }
 }

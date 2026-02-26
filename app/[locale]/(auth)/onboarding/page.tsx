@@ -30,16 +30,6 @@ type FieldErrors = Partial<
   >
 >;
 
-function slugifyTenantName(input: string) {
-  const raw = input.trim().toLowerCase();
-  const noSymbols = raw
-    .replace(/[\s_]+/g, "-")
-    .replace(/[^a-z0-9-]/g, "")
-    .replace(/-+/g, "-");
-  const sliced = noSymbols.slice(0, 64);
-  return sliced.replace(/^-+/, "").replace(/-+$/, "");
-}
-
 function getBackendMessage(data: unknown): string | null {
   if (!data || typeof data !== "object") return null;
   if (
@@ -105,7 +95,7 @@ export default function OnboardingPage() {
       await onboardingInitial({
         tenant: {
           name: tenantName.trim(),
-          slug: slugifyTenantName(tenantName),
+          slug: tenantName.trim(),
         },
         branch: { name: branchName.trim() },
         admin: {
