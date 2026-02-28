@@ -1,0 +1,126 @@
+"use client";
+
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
+
+import { employeesApi } from "@/lib/employees/api";
+import type { EmployeeRecord, EmployeesListQuery } from "@/lib/employees/types";
+import { getAxiosErrorMessage } from "@/lib/products/utils";
+
+type State = {
+  items: EmployeeRecord[];
+  nextCursor: string | null;
+  loading: boolean;
+  loadingMore: boolean;
+  error: string | null;
+};
+
+type Filters = Omit<EmployeesListQuery, "limit" | "cursor">;
+
+export function useEmployeesList(options?: { limit?: number; initialFilters?: Filters }) {
+  const tc = useTranslations("Common");
+  const limit = options?.limit ?? 20;
+
+  const [filters, setFilters] = useState<Filters>(options?.initialFilters ?? {});
+
+  const [state, setState] = useState<State>({
+    items: [],
+    nextCursor: null,
+    loading: true,
+    loadingMore: false,
+    error: null,
+  });
+
+  const abortRef = useRef<AbortController | null>(null);
+
+  const queryBase = useMemo(
+    () => ({ ...filters, limit } satisfies EmployeesListQuery),
+    [filters, limit]
+  );
+
+  const fetchPage = useCallback(
+    async (cursor: string | null, mode: "replace" | "append") => {
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
+
+      setState((s) => ({
+        ...s,
+        error: null,
+        loading: mode === "replace",
+        loadingMore: mode === "append",
+      }));
+
+      try {
+        const res = await employeesApi.list(
+          {
+            ...queryBase,
+            cursor: cursor ?? undefined,
+          },
+          { signal: controller.signal }
+        );
+
+        setState((s) => {
+          const nextItems = mode === "replace" ? res.items : [...s.items, ...res.items];
+          const seen = new Set<string>();
+          const deduped: EmployeeRecord[] = [];
+          for (const item of nextItems) {
+            if (seen.has(item.membership.id)) continue;
+            seen.add(item.membership.id);
+            deduped.push(item);
+          }
+
+          return {
+            items: deduped,
+            nextCursor: res.nextCursor,
+            loading: false,
+            loadingMore: false,
+            error: null,
+          };
+        });
+      } catch (err) {
+        if (controller.signal.aborted) return;
+        setState((s) => ({
+          ...s,
+          loading: false,
+          loadingMore: false,
+          error: getAxiosErrorMessage(err) ?? tc("errors.generic"),
+        }));
+      }
+    },
+    [queryBase, tc]
+  );
+
+  useEffect(() => {
+    void fetchPage(null, "replace");
+    return () => abortRef.current?.abort();
+  }, [fetchPage]);
+
+  const canLoadMore = useMemo(
+    () => Boolean(state.nextCursor) && !state.loading && !state.loadingMore,
+    [state.loading, state.loadingMore, state.nextCursor]
+  );
+
+  const refresh = useCallback(async () => {
+    await fetchPage(null, "replace");
+  }, [fetchPage]);
+
+  const loadMore = useCallback(async () => {
+    if (!state.nextCursor) return;
+    await fetchPage(state.nextCursor, "append");
+  }, [fetchPage, state.nextCursor]);
+
+  return {
+    items: state.items,
+    nextCursor: state.nextCursor,
+    loading: state.loading,
+    loadingMore: state.loadingMore,
+    error: state.error,
+
+    filters,
+    setFilters,
+    refresh,
+    canLoadMore,
+    loadMore,
+  };
+}

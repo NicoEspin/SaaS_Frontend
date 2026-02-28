@@ -18,6 +18,7 @@ type Props = {
   action?: {
     label: string;
     onClick: () => void;
+    variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
   };
   className?: string;
 };
@@ -61,7 +62,7 @@ export function EmptyState({
       <p className="mt-1 max-w-xs text-sm text-muted-foreground">{resolvedDescription}</p>
 
       {action ? (
-        <Button size="sm" className="mt-6" onClick={action.onClick}>
+        <Button size="sm" variant={action.variant ?? "default"} className="mt-6" onClick={action.onClick}>
           {action.label}
         </Button>
       ) : null}

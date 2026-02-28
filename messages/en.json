@@ -3,8 +3,11 @@
     "brand": "Stock",
     "dashboard": "Dashboard",
     "branches": "Branches",
+    "employees": "Employees",
     "inventory": "Inventory",
     "products": "Products",
+    "suppliers": "Suppliers",
+    "purchaseOrders": "Purchase orders",
     "clients": "Clients",
     "invoices": "Invoices",
     "reports": "Reports",
@@ -101,6 +104,8 @@
     "dashboardSubtitle": "Overview and quick actions.",
     "branchesTitle": "Branches",
     "branchesSubtitle": "Create, rename, and remove branches.",
+    "employeesTitle": "Employees",
+    "employeesSubtitle": "Create and manage your team.",
     "inventoryTitle": "Inventory",
     "inventorySubtitle": "Manage stock levels and locations.",
     "inventory": {
@@ -109,6 +114,10 @@
     },
     "productsTitle": "Products",
     "productsSubtitle": "Create and update your catalog.",
+    "suppliersTitle": "Suppliers",
+    "suppliersSubtitle": "Manage suppliers and payment terms.",
+    "purchaseOrdersTitle": "Purchase orders",
+    "purchaseOrdersSubtitle": "Track drafts, confirmations, and receipts.",
     "clientsTitle": "Clients",
     "clientsSubtitle": "Manage your customers and billing details.",
     "invoicesTitle": "Invoices",
@@ -119,6 +128,317 @@
     "reportsSubtitle": "Track KPIs and exports.",
     "settingsTitle": "Settings",
     "settingsSubtitle": "Personalize your workspace."
+  },
+  "Suppliers": {
+    "actions": {
+      "new": "New supplier"
+    },
+    "filters": {
+      "title": "Filters",
+      "activeCount": "{count} active",
+      "q": "Search",
+      "qPlaceholder": "Name, email, tax id...",
+      "isActive": "Status"
+    },
+    "fields": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "address": "Address",
+      "taxId": "Tax ID",
+      "paymentTerms": "Payment terms",
+      "notes": "Notes",
+      "isActive": "Active",
+      "updatedAt": "Updated"
+    },
+    "placeholders": {
+      "email": "Optional email",
+      "phone": "Optional phone",
+      "address": "Optional address",
+      "taxId": "Optional tax id",
+      "paymentTerms": "e.g. NET30, Cash",
+      "notes": "Internal notes..."
+    },
+    "hints": {
+      "paymentTerms": "Free text. Use the supplier's agreed terms.",
+      "isActive": "Inactive suppliers stay in history but are hidden by default."
+    },
+    "table": {
+      "title": "Suppliers",
+      "count": "{count} items"
+    },
+    "pagination": {
+      "loadMore": "Load more",
+      "moreAvailable": "More results available.",
+      "end": "End of results."
+    },
+    "form": {
+      "createTitle": "Create supplier",
+      "createSubtitle": "Fill in the details and save.",
+      "editTitle": "Edit supplier",
+      "editSubtitle": "Update the details and save.",
+      "sections": {
+        "basicsTitle": "Basics",
+        "basicsSubtitle": "Name, payment terms, and primary contact.",
+        "detailsTitle": "Details",
+        "detailsSubtitle": "Address, tax id, and internal notes.",
+        "statusTitle": "Status",
+        "statusSubtitle": "Control whether this supplier can be used."
+      }
+    },
+    "validation": {
+      "nameRequired": "Name is required.",
+      "paymentTermsRequired": "Payment terms are required.",
+      "invalidEmail": "Enter a valid email address."
+    },
+    "errors": {
+      "notFound": "Supplier not found."
+    },
+    "success": {
+      "created": "Supplier created",
+      "updated": "Supplier updated"
+    },
+    "supplierSelect": {
+      "triggerPlaceholder": "Select supplier",
+      "triggerAria": "Supplier: {value}",
+      "searchPlaceholder": "Search supplier...",
+      "listTitle": "Suppliers",
+      "empty": "No suppliers.",
+      "noResults": "No results.",
+      "clear": "Clear",
+      "any": "Any supplier"
+    }
+  },
+  "PurchaseOrders": {
+    "actions": {
+      "open": "Open",
+      "new": "New purchase order",
+      "backToList": "Back to list",
+      "confirm": "Confirm",
+      "confirming": "Confirming...",
+      "createReceipt": "Receive goods",
+      "cancel": "Cancel",
+      "cancelling": "Cancelling..."
+    },
+    "filters": {
+      "title": "Filters",
+      "activeCount": "{count} active",
+      "status": "Status",
+      "supplier": "Supplier",
+      "branch": "Branch"
+    },
+    "fields": {
+      "id": "ID",
+      "status": "Status",
+      "supplier": "Supplier",
+      "branch": "Branch",
+      "expectedAt": "Expected",
+      "updatedAt": "Updated"
+    },
+    "detail": {
+      "titleFallback": "Purchase order",
+      "title": "Purchase order {id}",
+      "subtitle": "Status, lines, and receipts.",
+      "sections": {
+        "overview": "Overview",
+        "lines": "Lines",
+        "receipts": "Receipts"
+      },
+      "fields": {
+        "supplier": "Supplier",
+        "branch": "Branch",
+        "expectedAt": "Expected at",
+        "notes": "Notes",
+        "createdAt": "Created at",
+        "updatedAt": "Updated"
+      },
+      "lines": {
+        "emptyTitle": "No lines",
+        "emptyDescription": "This purchase order has no items.",
+        "columns": {
+          "product": "Item",
+          "quantityOrdered": "Ordered",
+          "receivedQty": "Received",
+          "pendingQty": "Pending",
+          "agreedUnitCost": "Agreed cost"
+        }
+      },
+      "receipts": {
+        "count": "{count} receipts",
+        "emptyTitle": "No receipts yet",
+        "emptyDescription": "Receipts will appear here once goods are received.",
+        "receiptTitle": "Receipt {id}",
+        "lines": "{count} lines",
+        "totalQty": "{qty} units",
+        "fields": {
+          "receivedAt": "Received at",
+          "payableId": "Payable",
+          "notes": "Notes"
+        },
+        "columns": {
+          "item": "Item",
+          "quantityReceived": "Qty received",
+          "actualUnitCost": "Actual cost"
+        }
+      }
+    },
+    "cancel": {
+      "title": "Cancel purchase order",
+      "description": "You are about to cancel this purchase order. This action cannot be undone.",
+      "confirm": "Cancel"
+    },
+    "table": {
+      "title": "Purchase orders",
+      "count": "{count} items"
+    },
+    "pagination": {
+      "loadMore": "Load more",
+      "moreAvailable": "More results available.",
+      "end": "End of results."
+    },
+    "errors": {
+      "conflict": "This purchase order changed. Refresh and try again.",
+      "cannotCancel": "This purchase order cannot be cancelled."
+    },
+    "success": {
+      "created": "Purchase order created",
+      "confirmed": "Purchase order confirmed",
+      "cancelled": "Purchase order cancelled",
+      "receiptCreated": "Receipt created"
+    },
+    "create": {
+      "title": "Create purchase order",
+      "subtitle": "Select supplier and branch, then add lines.",
+      "sections": {
+        "headerTitle": "Header",
+        "headerSubtitle": "Supplier, branch, and expected date.",
+        "linesTitle": "Lines",
+        "linesSubtitle": "Add products and agreed costs."
+      },
+      "fields": {
+        "supplier": "Supplier",
+        "branch": "Branch",
+        "expectedAt": "Expected at",
+        "notes": "Notes"
+      },
+      "hints": {
+        "expectedAt": "Optional. Used for planning and follow-up."
+      },
+      "placeholders": {
+        "notes": "Internal notes..."
+      },
+      "actions": {
+        "addLine": "Add line",
+        "removeLine": "Remove line",
+        "submit": "Create purchase order",
+        "clear": "Clear"
+      },
+      "footer": {
+        "lines": "{count} lines"
+      },
+      "lines": {
+        "emptyTitle": "No lines",
+        "emptyDescription": "Add at least one item to create the order.",
+        "lineTitle": "Line {index}",
+        "lineSubtitle": "Quantity and cost per item.",
+        "modeExisting": "Existing product",
+        "modeNew": "New product",
+        "newProductHint": "Enter the new product details below.",
+        "newProductActiveHint": "New products are active by default.",
+        "noAttributes": "No attribute definitions for this category.",
+        "fields": {
+          "mode": "Type",
+          "product": "Product",
+          "quantityOrdered": "Quantity",
+          "agreedUnitCost": "Agreed unit cost",
+          "customAttributes": "Custom attributes (JSON)"
+        },
+        "placeholders": {
+          "customAttributes": "{\n  \"color\": \"red\"\n}"
+        },
+        "hints": {
+          "customAttributes": "Optional. Must be a JSON object and will be merged with category attributes."
+        },
+        "attributes": {
+          "required": "Required",
+          "optional": "Optional",
+          "pickOne": "Pick one",
+          "unset": "Unset"
+        }
+      },
+      "validation": {
+        "supplierRequired": "Supplier is required.",
+        "branchRequired": "Branch is required.",
+        "linesRequired": "Add at least one line.",
+        "qtyRequired": "Enter a quantity greater than 0.",
+        "costRequired": "Enter a valid cost.",
+        "productRequired": "Select a product.",
+        "newCodeRequired": "Product code is required.",
+        "newNameRequired": "Product name is required.",
+        "customAttributesInvalid": "Invalid JSON. Provide an object like { \"key\": \"value\" }."
+      },
+      "errors": {
+        "fixForm": "Fix the highlighted fields."
+      }
+    },
+    "receipt": {
+      "title": "Receive goods",
+      "subtitle": "Create a receipt and update inventory.",
+      "sections": {
+        "headerTitle": "Receipt",
+        "headerSubtitle": "Date, notes, and payable reference.",
+        "linesTitle": "Items",
+        "linesSubtitle": "Enter received quantity and actual cost per item."
+      },
+      "fields": {
+        "receivedAt": "Received at",
+        "payableId": "Payable",
+        "notes": "Notes",
+        "pendingTotal": "Pending"
+      },
+      "placeholders": {
+        "payableId": "Optional payable id",
+        "notes": "Notes..."
+      },
+      "labels": {
+        "pendingQty": "{qty} pending",
+        "receivingQty": "{qty} receiving"
+      },
+      "hints": {
+        "pending": "You can only receive up to the pending quantity for each item."
+      },
+      "columns": {
+        "item": "Item",
+        "pendingQty": "Pending",
+        "quantityReceived": "Qty received",
+        "actualUnitCost": "Actual unit cost"
+      },
+      "actions": {
+        "submit": "Create receipt"
+      },
+      "footer": {
+        "selected": "{count} lines selected"
+      },
+      "validation": {
+        "qtyInvalid": "Enter a valid quantity.",
+        "qtyTooHigh": "Max {max}.",
+        "costInvalid": "Enter a valid cost."
+      },
+      "errors": {
+        "fixForm": "Fix the highlighted fields.",
+        "noItems": "Select at least one line with quantity > 0.",
+        "cannotReceive": "Cannot receive goods for this order."
+      }
+    },
+    "enums": {
+      "status": {
+        "DRAFT": "Draft",
+        "CONFIRMED": "Confirmed",
+        "PARTIALLY_RECEIVED": "Partially received",
+        "COMPLETED": "Completed",
+        "CANCELLED": "Cancelled"
+      }
+    }
   },
   "Clients": {
     "actions": {
@@ -508,6 +828,16 @@
       "edit": "Edit",
       "delete": "Delete"
     },
+    "productSelect": {
+      "triggerPlaceholder": "Select product",
+      "triggerAria": "Product: {value}",
+      "searchPlaceholder": "Search product by code or name...",
+      "listTitle": "Products",
+      "empty": "No products.",
+      "noResults": "No results.",
+      "clear": "Clear",
+      "any": "Any product"
+    },
     "filters": {
       "title": "Filters",
       "activeCount": "{count} active",
@@ -754,6 +1084,92 @@
       "created": "Branch created",
       "updated": "Branch updated",
       "deleted": "Branch deleted"
+    },
+    "select": {
+      "triggerPlaceholder": "Select branch",
+      "triggerAria": "Branch: {value}",
+      "searchPlaceholder": "Search branch...",
+      "listTitle": "Branches",
+      "empty": "No branches.",
+      "noResults": "No results.",
+      "clear": "Clear",
+      "any": "Any branch"
+    }
+  },
+  "Employees": {
+    "title": "Employees",
+    "subtitle": "Manage access, roles, and active branches.",
+    "actions": {
+      "new": "New employee"
+    },
+    "filters": {
+      "title": "Filters",
+      "activeCount": "{count} active",
+      "q": "Search",
+      "qPlaceholder": "Name or email...",
+      "role": "Role",
+      "branch": "Branch",
+      "anyBranch": "Any branch",
+      "branchEmpty": "No branches"
+    },
+    "table": {
+      "title": "Employees",
+      "count": "{count} items"
+    },
+    "fields": {
+      "fullName": "Full name",
+      "fullNamePlaceholder": "e.g. Juan Perez",
+      "email": "Email",
+      "emailPlaceholder": "e.g. juan@acme.com",
+      "password": "Password",
+      "passwordPlaceholder": "At least 8 characters",
+      "role": "Role",
+      "branch": "Branch",
+      "branchUnassigned": "Unassigned",
+      "createdAt": "Created"
+    },
+    "roles": {
+      "OWNER": "Owner",
+      "ADMIN": "Admin",
+      "MANAGER": "Manager",
+      "CASHIER": "Cashier"
+    },
+    "form": {
+      "createTitle": "Create employee",
+      "createSubtitle": "Create credentials and assign a branch.",
+      "editTitle": "Edit employee",
+      "editSubtitle": "Update role and active branch.",
+      "ownerNotAvailable": "Owner role is not available when creating employees.",
+      "emailReadOnly": "Email cannot be changed.",
+      "passwordHint": "Minimum {min} characters."
+    },
+    "validation": {
+      "fullNameRequired": "Full name is required.",
+      "fullNameMax": "Full name must be at most {max} characters.",
+      "emailRequired": "Email is required.",
+      "emailMax": "Email must be at most {max} characters.",
+      "invalidEmail": "Enter a valid email address.",
+      "passwordRequired": "Password is required.",
+      "passwordMin": "Password must be at least {min} characters.",
+      "passwordMax": "Password must be at most {max} characters.",
+      "roleRequired": "Role is required.",
+      "branchRequired": "Branch is required.",
+      "noChanges": "No changes to save.",
+      "noBranches": "No branches available."
+    },
+    "errors": {
+      "emailConflict": "That email is already registered.",
+      "forbidden": "You do not have permission to perform this action.",
+      "ownerLocked": "Only an owner can modify an owner employee."
+    },
+    "pagination": {
+      "loadMore": "Load more",
+      "moreAvailable": "More results available.",
+      "end": "End of results."
+    },
+    "success": {
+      "created": "Employee created",
+      "updated": "Employee updated"
     }
   },
   "ImportExport": {

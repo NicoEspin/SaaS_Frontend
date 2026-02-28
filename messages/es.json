@@ -3,8 +3,11 @@
     "brand": "Stock",
     "dashboard": "Dashboard",
     "branches": "Sucursales",
+    "employees": "Empleados",
     "inventory": "Inventario",
     "products": "Productos",
+    "suppliers": "Proveedores",
+    "purchaseOrders": "Ordenes de compra",
     "clients": "Clientes",
     "invoices": "Facturas",
     "reports": "Reportes",
@@ -101,6 +104,8 @@
     "dashboardSubtitle": "Resumen y acciones rapidas.",
     "branchesTitle": "Sucursales",
     "branchesSubtitle": "Crea, renombra y elimina sucursales.",
+    "employeesTitle": "Empleados",
+    "employeesSubtitle": "Crea y administra tu equipo.",
     "inventoryTitle": "Inventario",
     "inventorySubtitle": "Gestiona stock y ubicaciones.",
     "inventory": {
@@ -109,6 +114,10 @@
     },
     "productsTitle": "Productos",
     "productsSubtitle": "Crea y actualiza tu catalogo.",
+    "suppliersTitle": "Proveedores",
+    "suppliersSubtitle": "Gestiona proveedores y condiciones de pago.",
+    "purchaseOrdersTitle": "Ordenes de compra",
+    "purchaseOrdersSubtitle": "Segui borradores, confirmaciones y recepciones.",
     "clientsTitle": "Clientes",
     "clientsSubtitle": "Gestiona tus clientes y datos de facturacion.",
     "invoicesTitle": "Facturas",
@@ -119,6 +128,317 @@
     "reportsSubtitle": "Revisa KPIs y exportaciones.",
     "settingsTitle": "Configuracion",
     "settingsSubtitle": "Personaliza tu espacio de trabajo."
+  },
+  "Suppliers": {
+    "actions": {
+      "new": "Nuevo proveedor"
+    },
+    "filters": {
+      "title": "Filtros",
+      "activeCount": "{count} activos",
+      "q": "Buscar",
+      "qPlaceholder": "Nombre, email, CUIT...",
+      "isActive": "Estado"
+    },
+    "fields": {
+      "name": "Nombre",
+      "email": "Email",
+      "phone": "Telefono",
+      "address": "Direccion",
+      "taxId": "CUIT",
+      "paymentTerms": "Condiciones de pago",
+      "notes": "Notas",
+      "isActive": "Activo",
+      "updatedAt": "Actualizado"
+    },
+    "placeholders": {
+      "email": "Email opcional",
+      "phone": "Telefono opcional",
+      "address": "Direccion opcional",
+      "taxId": "CUIT opcional",
+      "paymentTerms": "Ej: NET30, Contado",
+      "notes": "Notas internas..."
+    },
+    "hints": {
+      "paymentTerms": "Texto libre. Usa lo acordado con el proveedor.",
+      "isActive": "Los proveedores inactivos quedan en el historial pero se ocultan por defecto."
+    },
+    "table": {
+      "title": "Proveedores",
+      "count": "{count} items"
+    },
+    "pagination": {
+      "loadMore": "Cargar mas",
+      "moreAvailable": "Hay mas resultados disponibles.",
+      "end": "Fin de resultados."
+    },
+    "form": {
+      "createTitle": "Crear proveedor",
+      "createSubtitle": "Completa los datos y guarda.",
+      "editTitle": "Editar proveedor",
+      "editSubtitle": "Actualiza los datos y guarda.",
+      "sections": {
+        "basicsTitle": "Basico",
+        "basicsSubtitle": "Nombre, condiciones de pago y contacto.",
+        "detailsTitle": "Detalle",
+        "detailsSubtitle": "Direccion, CUIT y notas internas.",
+        "statusTitle": "Estado",
+        "statusSubtitle": "Controla si este proveedor se puede usar."
+      }
+    },
+    "validation": {
+      "nameRequired": "El nombre es obligatorio.",
+      "paymentTermsRequired": "Las condiciones de pago son obligatorias.",
+      "invalidEmail": "Ingresa un email valido."
+    },
+    "errors": {
+      "notFound": "Proveedor no encontrado."
+    },
+    "success": {
+      "created": "Proveedor creado",
+      "updated": "Proveedor actualizado"
+    },
+    "supplierSelect": {
+      "triggerPlaceholder": "Seleccionar proveedor",
+      "triggerAria": "Proveedor: {value}",
+      "searchPlaceholder": "Buscar proveedor...",
+      "listTitle": "Proveedores",
+      "empty": "No hay proveedores.",
+      "noResults": "Sin resultados.",
+      "clear": "Limpiar",
+      "any": "Cualquier proveedor"
+    }
+  },
+  "PurchaseOrders": {
+    "actions": {
+      "open": "Abrir",
+      "new": "Nueva orden de compra",
+      "backToList": "Volver al listado",
+      "confirm": "Confirmar",
+      "confirming": "Confirmando...",
+      "createReceipt": "Recibir mercaderia",
+      "cancel": "Cancelar",
+      "cancelling": "Cancelando..."
+    },
+    "filters": {
+      "title": "Filtros",
+      "activeCount": "{count} activos",
+      "status": "Estado",
+      "supplier": "Proveedor",
+      "branch": "Sucursal"
+    },
+    "fields": {
+      "id": "ID",
+      "status": "Estado",
+      "supplier": "Proveedor",
+      "branch": "Sucursal",
+      "expectedAt": "Esperada",
+      "updatedAt": "Actualizado"
+    },
+    "detail": {
+      "titleFallback": "Orden de compra",
+      "title": "Orden de compra {id}",
+      "subtitle": "Estado, lineas y recepciones.",
+      "sections": {
+        "overview": "Resumen",
+        "lines": "Lineas",
+        "receipts": "Recepciones"
+      },
+      "fields": {
+        "supplier": "Proveedor",
+        "branch": "Sucursal",
+        "expectedAt": "Fecha esperada",
+        "notes": "Notas",
+        "createdAt": "Creada",
+        "updatedAt": "Actualizada"
+      },
+      "lines": {
+        "emptyTitle": "Sin lineas",
+        "emptyDescription": "Esta orden de compra no tiene items.",
+        "columns": {
+          "product": "Item",
+          "quantityOrdered": "Pedida",
+          "receivedQty": "Recibida",
+          "pendingQty": "Pendiente",
+          "agreedUnitCost": "Costo acordado"
+        }
+      },
+      "receipts": {
+        "count": "{count} recepciones",
+        "emptyTitle": "Sin recepciones",
+        "emptyDescription": "Las recepciones van a aparecer aca cuando ingresen mercaderia.",
+        "receiptTitle": "Recepcion {id}",
+        "lines": "{count} lineas",
+        "totalQty": "{qty} unidades",
+        "fields": {
+          "receivedAt": "Recibida",
+          "payableId": "Cuenta a pagar",
+          "notes": "Notas"
+        },
+        "columns": {
+          "item": "Item",
+          "quantityReceived": "Cant. recibida",
+          "actualUnitCost": "Costo real"
+        }
+      }
+    },
+    "cancel": {
+      "title": "Cancelar orden de compra",
+      "description": "Estas por cancelar esta orden de compra. Esta accion no se puede deshacer.",
+      "confirm": "Cancelar"
+    },
+    "table": {
+      "title": "Ordenes de compra",
+      "count": "{count} items"
+    },
+    "pagination": {
+      "loadMore": "Cargar mas",
+      "moreAvailable": "Hay mas resultados disponibles.",
+      "end": "Fin de resultados."
+    },
+    "errors": {
+      "conflict": "La orden de compra cambio. Refresca e intenta de nuevo.",
+      "cannotCancel": "Esta orden de compra no se puede cancelar."
+    },
+    "success": {
+      "created": "Orden de compra creada",
+      "confirmed": "Orden de compra confirmada",
+      "cancelled": "Orden de compra cancelada",
+      "receiptCreated": "Recepcion creada"
+    },
+    "create": {
+      "title": "Crear orden de compra",
+      "subtitle": "Selecciona proveedor y sucursal, y agrega lineas.",
+      "sections": {
+        "headerTitle": "Encabezado",
+        "headerSubtitle": "Proveedor, sucursal y fecha esperada.",
+        "linesTitle": "Lineas",
+        "linesSubtitle": "Agrega productos y costos acordados."
+      },
+      "fields": {
+        "supplier": "Proveedor",
+        "branch": "Sucursal",
+        "expectedAt": "Fecha esperada",
+        "notes": "Notas"
+      },
+      "hints": {
+        "expectedAt": "Opcional. Sirve para planificacion y seguimiento."
+      },
+      "placeholders": {
+        "notes": "Notas internas..."
+      },
+      "actions": {
+        "addLine": "Agregar linea",
+        "removeLine": "Quitar linea",
+        "submit": "Crear orden de compra",
+        "clear": "Limpiar"
+      },
+      "footer": {
+        "lines": "{count} lineas"
+      },
+      "lines": {
+        "emptyTitle": "Sin lineas",
+        "emptyDescription": "Agrega al menos un item para crear la orden.",
+        "lineTitle": "Linea {index}",
+        "lineSubtitle": "Cantidad y costo por item.",
+        "modeExisting": "Producto existente",
+        "modeNew": "Producto nuevo",
+        "newProductHint": "Completa los datos del producto nuevo debajo.",
+        "newProductActiveHint": "Los productos nuevos quedan activos por defecto.",
+        "noAttributes": "No hay definiciones de atributos para esta categoria.",
+        "fields": {
+          "mode": "Tipo",
+          "product": "Producto",
+          "quantityOrdered": "Cantidad",
+          "agreedUnitCost": "Costo unitario acordado",
+          "customAttributes": "Atributos custom (JSON)"
+        },
+        "placeholders": {
+          "customAttributes": "{\n  \"color\": \"rojo\"\n}"
+        },
+        "hints": {
+          "customAttributes": "Opcional. Debe ser un objeto JSON y se mezcla con los atributos de categoria."
+        },
+        "attributes": {
+          "required": "Obligatorio",
+          "optional": "Opcional",
+          "pickOne": "Elegir",
+          "unset": "Sin asignar"
+        }
+      },
+      "validation": {
+        "supplierRequired": "El proveedor es obligatorio.",
+        "branchRequired": "La sucursal es obligatoria.",
+        "linesRequired": "Agrega al menos una linea.",
+        "qtyRequired": "Ingresa una cantidad mayor a 0.",
+        "costRequired": "Ingresa un costo valido.",
+        "productRequired": "Selecciona un producto.",
+        "newCodeRequired": "El codigo es obligatorio.",
+        "newNameRequired": "El nombre es obligatorio.",
+        "customAttributesInvalid": "JSON invalido. Debe ser un objeto como { \"key\": \"value\" }."
+      },
+      "errors": {
+        "fixForm": "Corregi los campos marcados."
+      }
+    },
+    "receipt": {
+      "title": "Recibir mercaderia",
+      "subtitle": "Crea una recepcion y actualiza inventario.",
+      "sections": {
+        "headerTitle": "Recepcion",
+        "headerSubtitle": "Fecha, notas y referencia.",
+        "linesTitle": "Items",
+        "linesSubtitle": "Ingresa cantidad recibida y costo real por item."
+      },
+      "fields": {
+        "receivedAt": "Recibida",
+        "payableId": "Cuenta a pagar",
+        "notes": "Notas",
+        "pendingTotal": "Pendiente"
+      },
+      "placeholders": {
+        "payableId": "ID opcional",
+        "notes": "Notas..."
+      },
+      "labels": {
+        "pendingQty": "{qty} pendientes",
+        "receivingQty": "{qty} recibiendo"
+      },
+      "hints": {
+        "pending": "Solo podes recibir hasta la cantidad pendiente por item."
+      },
+      "columns": {
+        "item": "Item",
+        "pendingQty": "Pendiente",
+        "quantityReceived": "Cant. recibida",
+        "actualUnitCost": "Costo unitario real"
+      },
+      "actions": {
+        "submit": "Crear recepcion"
+      },
+      "footer": {
+        "selected": "{count} lineas seleccionadas"
+      },
+      "validation": {
+        "qtyInvalid": "Ingresa una cantidad valida.",
+        "qtyTooHigh": "Max {max}.",
+        "costInvalid": "Ingresa un costo valido."
+      },
+      "errors": {
+        "fixForm": "Corregi los campos marcados.",
+        "noItems": "Selecciona al menos una linea con cantidad > 0.",
+        "cannotReceive": "No se puede recibir mercaderia para esta orden."
+      }
+    },
+    "enums": {
+      "status": {
+        "DRAFT": "Borrador",
+        "CONFIRMED": "Confirmada",
+        "PARTIALLY_RECEIVED": "Recibida parcial",
+        "COMPLETED": "Completada",
+        "CANCELLED": "Cancelada"
+      }
+    }
   },
   "Clients": {
     "actions": {
@@ -508,6 +828,16 @@
       "edit": "Editar",
       "delete": "Eliminar"
     },
+    "productSelect": {
+      "triggerPlaceholder": "Seleccionar producto",
+      "triggerAria": "Producto: {value}",
+      "searchPlaceholder": "Buscar por codigo o nombre...",
+      "listTitle": "Productos",
+      "empty": "No hay productos.",
+      "noResults": "Sin resultados.",
+      "clear": "Limpiar",
+      "any": "Cualquier producto"
+    },
     "filters": {
       "title": "Filtros",
       "activeCount": "{count} activos",
@@ -754,6 +1084,92 @@
       "created": "Sucursal creada",
       "updated": "Sucursal actualizada",
       "deleted": "Sucursal eliminada"
+    },
+    "select": {
+      "triggerPlaceholder": "Seleccionar sucursal",
+      "triggerAria": "Sucursal: {value}",
+      "searchPlaceholder": "Buscar sucursal...",
+      "listTitle": "Sucursales",
+      "empty": "No hay sucursales.",
+      "noResults": "Sin resultados.",
+      "clear": "Limpiar",
+      "any": "Cualquier sucursal"
+    }
+  },
+  "Employees": {
+    "title": "Empleados",
+    "subtitle": "Administra accesos, roles y sucursal activa.",
+    "actions": {
+      "new": "Nuevo empleado"
+    },
+    "filters": {
+      "title": "Filtros",
+      "activeCount": "{count} activos",
+      "q": "Busqueda",
+      "qPlaceholder": "Nombre o email...",
+      "role": "Rol",
+      "branch": "Sucursal",
+      "anyBranch": "Cualquier sucursal",
+      "branchEmpty": "Sin sucursales"
+    },
+    "table": {
+      "title": "Empleados",
+      "count": "{count} items"
+    },
+    "fields": {
+      "fullName": "Nombre completo",
+      "fullNamePlaceholder": "Ej: Juan Perez",
+      "email": "Email",
+      "emailPlaceholder": "Ej: juan@acme.com",
+      "password": "Password",
+      "passwordPlaceholder": "Minimo 8 caracteres",
+      "role": "Rol",
+      "branch": "Sucursal",
+      "branchUnassigned": "Sin asignar",
+      "createdAt": "Creado"
+    },
+    "roles": {
+      "OWNER": "Propietario",
+      "ADMIN": "Admin",
+      "MANAGER": "Encargado",
+      "CASHIER": "Cajero"
+    },
+    "form": {
+      "createTitle": "Crear empleado",
+      "createSubtitle": "Crea credenciales y asigna una sucursal.",
+      "editTitle": "Editar empleado",
+      "editSubtitle": "Actualiza rol y sucursal activa.",
+      "ownerNotAvailable": "El rol Owner no esta disponible al crear empleados.",
+      "emailReadOnly": "El email no se puede cambiar.",
+      "passwordHint": "Minimo {min} caracteres."
+    },
+    "validation": {
+      "fullNameRequired": "El nombre completo es obligatorio.",
+      "fullNameMax": "El nombre completo debe tener como maximo {max} caracteres.",
+      "emailRequired": "El email es obligatorio.",
+      "emailMax": "El email debe tener como maximo {max} caracteres.",
+      "invalidEmail": "Ingresa un email valido.",
+      "passwordRequired": "La password es obligatoria.",
+      "passwordMin": "La password debe tener al menos {min} caracteres.",
+      "passwordMax": "La password debe tener como maximo {max} caracteres.",
+      "roleRequired": "El rol es obligatorio.",
+      "branchRequired": "La sucursal es obligatoria.",
+      "noChanges": "No hay cambios para guardar.",
+      "noBranches": "No hay sucursales disponibles."
+    },
+    "errors": {
+      "emailConflict": "Ese email ya esta registrado.",
+      "forbidden": "No tenes permisos para realizar esta accion.",
+      "ownerLocked": "Solo un Owner puede modificar un empleado Owner."
+    },
+    "pagination": {
+      "loadMore": "Cargar mas",
+      "moreAvailable": "Hay mas resultados.",
+      "end": "Fin de resultados."
+    },
+    "success": {
+      "created": "Empleado creado",
+      "updated": "Empleado actualizado"
     }
   },
   "ImportExport": {
