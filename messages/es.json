@@ -5,6 +5,8 @@
     "branches": "Sucursales",
     "inventory": "Inventario",
     "products": "Productos",
+    "clients": "Clientes",
+    "invoices": "Facturas",
     "reports": "Reportes",
     "settings": "Configuracion",
     "openSettings": "Abrir configuracion",
@@ -13,6 +15,7 @@
     "expandSidebar": "Expandir sidebar",
     "themeToDark": "Cambiar a modo oscuro",
     "themeToLight": "Cambiar a modo claro",
+    "openCart": "Abrir carrito",
     "activeBranchAria": "Sucursal activa: {branch}",
     "userAria": "Sesion iniciada como {name}"
   },
@@ -106,10 +109,128 @@
     },
     "productsTitle": "Productos",
     "productsSubtitle": "Crea y actualiza tu catalogo.",
+    "clientsTitle": "Clientes",
+    "clientsSubtitle": "Gestiona tus clientes y datos de facturacion.",
+    "invoicesTitle": "Facturas",
+    "invoicesSubtitle": "Revisa, emiti y descarga facturas.",
+    "invoiceTitle": "Factura",
+    "invoiceSubtitle": "Detalle, items y PDF.",
     "reportsTitle": "Reportes",
     "reportsSubtitle": "Revisa KPIs y exportaciones.",
     "settingsTitle": "Configuracion",
     "settingsSubtitle": "Personaliza tu espacio de trabajo."
+  },
+  "Clients": {
+    "actions": {
+      "new": "Nuevo cliente",
+      "activate": "Activar",
+      "deactivate": "Desactivar"
+    },
+    "filters": {
+      "title": "Filtros",
+      "activeCount": "{count} activos",
+      "q": "Busqueda",
+      "qPlaceholder": "Nombre, codigo, documento, email...",
+      "code": "Codigo",
+      "codePlaceholder": "Ej: C001",
+      "name": "Nombre",
+      "namePlaceholder": "Ej: Juan Perez",
+      "taxId": "Documento",
+      "taxIdPlaceholder": "Ej: 20123456789",
+      "email": "Email",
+      "emailPlaceholder": "Ej: juan@example.com",
+      "phone": "Telefono",
+      "phonePlaceholder": "Ej: +54 11 5555-5555",
+      "isActive": "Estado",
+      "advanced": "Mas filtros"
+    },
+    "fields": {
+      "code": "Codigo",
+      "name": "Nombre",
+      "type": "Tipo",
+      "taxId": "Documento",
+      "taxIdType": "Tipo de documento",
+      "vatCondition": "Condicion IVA",
+      "email": "Email",
+      "phone": "Telefono",
+      "address": "Direccion",
+      "notes": "Notas",
+      "isActive": "Activo",
+      "updatedAt": "Actualizado"
+    },
+    "placeholders": {
+      "name": "Nombre o razon social",
+      "code": "Codigo opcional",
+      "taxId": "Documento opcional",
+      "email": "Email opcional",
+      "phone": "Telefono opcional",
+      "address": "Direccion opcional",
+      "notes": "Notas internas..."
+    },
+    "table": {
+      "title": "Clientes",
+      "count": "{count} items"
+    },
+    "pagination": {
+      "loadMore": "Cargar mas",
+      "moreAvailable": "Hay mas resultados.",
+      "end": "Fin de resultados."
+    },
+    "form": {
+      "createTitle": "Crear cliente",
+      "createSubtitle": "Completa los datos y guarda.",
+      "editTitle": "Editar cliente",
+      "editSubtitle": "Actualiza los datos y guarda.",
+      "sections": {
+        "basicsTitle": "Datos principales",
+        "basicsSubtitle": "Nombre, codigo, tipo y estado.",
+        "billingTitle": "Facturacion",
+        "billingSubtitle": "Documento e IVA (opcional).",
+        "contactTitle": "Contacto",
+        "contactSubtitle": "Email, telefono y direccion.",
+        "notesTitle": "Notas",
+        "notesSubtitle": "Notas internas opcionales."
+      }
+    },
+    "validation": {
+      "nameRequired": "El nombre es obligatorio.",
+      "nameMax": "El nombre debe tener como maximo {max} caracteres.",
+      "invalidEmail": "Ingresa un email valido."
+    },
+    "errors": {
+      "codeConflict": "Ese codigo ya existe."
+    },
+    "success": {
+      "created": "Cliente creado",
+      "updated": "Cliente actualizado",
+      "activated": "Cliente activado",
+      "deactivated": "Cliente desactivado"
+    },
+    "deactivate": {
+      "title": "Desactivar cliente",
+      "description": "Vas a desactivar {name} ({code}).",
+      "confirm": "Desactivar"
+    },
+    "enums": {
+      "type": {
+        "RETAIL": "Minorista",
+        "WHOLESALE": "Mayorista"
+      },
+      "taxIdType": {
+        "CUIT": "CUIT",
+        "CUIL": "CUIL",
+        "DNI": "DNI",
+        "PASSPORT": "Pasaporte",
+        "FOREIGN": "Extranjero"
+      },
+      "vatCondition": {
+        "REGISTERED": "Responsable inscripto",
+        "MONOTAX": "Monotributo",
+        "EXEMPT": "Exento",
+        "FINAL_CONSUMER": "Consumidor final",
+        "FOREIGN": "Exterior"
+      }
+    }
   },
   "Dashboard": {
     "title": "Dashboard",
@@ -173,6 +294,7 @@
       "confirm": "Confirmar",
       "cancel": "Cancelar",
       "close": "Cerrar",
+      "next": "Siguiente",
       "refresh": "Refrescar",
       "add": "Agregar",
       "edit": "Editar",
@@ -200,6 +322,27 @@
     "noResults": {
       "title": "Sin resultados",
       "description": "Proba ajustando la busqueda o los filtros."
+    }
+  },
+  "BranchSwitcher": {
+    "trigger": {
+      "placeholder": "Seleccionar sucursal",
+      "aria": "Sucursal activa: {branch}"
+    },
+    "search": {
+      "placeholder": "Buscar sucursales..."
+    },
+    "list": {
+      "title": "Sucursales",
+      "empty": "Sin sucursales.",
+      "noResults": "Sin coincidencias."
+    },
+    "success": {
+      "changed": "Sucursal activa actualizada"
+    },
+    "errors": {
+      "forbidden": "No tenes permisos para cambiar la sucursal activa.",
+      "invalid": "La sucursal no es valida."
     }
   },
   "Inventory": {
@@ -238,6 +381,122 @@
     "success": {
       "adjusted": "Stock ajustado",
       "transferred": "Stock transferido"
+    }
+  },
+  "Invoices": {
+    "activeBranchLabel": "Sucursal activa",
+    "actions": {
+      "refreshBranches": "Actualizar sucursales",
+      "refreshInvoices": "Actualizar facturas",
+      "view": "Ver factura",
+      "issue": "Emitir",
+      "openPdf": "Abrir PDF",
+      "backToList": "Volver a facturas"
+    },
+    "filters": {
+      "title": "Filtros",
+      "activeCount": "{count} activos",
+      "status": "Estado",
+      "customerId": "Cliente"
+    },
+    "customerSelect": {
+      "triggerPlaceholder": "Cualquier cliente",
+      "triggerAria": "Filtro de cliente: {value}",
+      "searchPlaceholder": "Buscar clientes...",
+      "listTitle": "Clientes",
+      "any": "Cualquier cliente",
+      "clear": "Limpiar",
+      "empty": "Sin clientes.",
+      "noResults": "Sin coincidencias."
+    },
+    "table": {
+      "title": "Facturas",
+      "count": "{count} items",
+      "columns": {
+        "number": "Numero",
+        "status": "Estado",
+        "docType": "Doc",
+        "customer": "Cliente",
+        "total": "Total",
+        "issuedAt": "Emitida",
+        "createdAt": "Creada",
+        "actions": "Acciones"
+      }
+    },
+    "pagination": {
+      "loadMore": "Cargar mas",
+      "moreAvailable": "Hay mas resultados.",
+      "end": "Fin de resultados."
+    },
+    "labels": {
+      "finalConsumer": "Consumidor final"
+    },
+    "enums": {
+      "status": {
+        "DRAFT": "Borrador",
+        "ISSUED": "Emitida"
+      },
+      "docType": {
+        "A": "A",
+        "B": "B"
+      },
+      "mode": {
+        "INTERNAL": "Interno",
+        "ARCA": "ARCA"
+      }
+    },
+    "issueDialog": {
+      "title": "Emitir factura",
+      "description": "Asigna un numero y marca la factura como emitida.",
+      "fields": {
+        "docType": "Tipo de documento",
+        "mode": "Modo"
+      },
+      "hints": {
+        "docTypeARequiresCustomer": "El tipo A requiere un cliente en la factura.",
+        "modeArcaNotAvailable": "La emision ARCA todavia no esta disponible."
+      },
+      "submit": "Emitir",
+      "success": "Factura emitida"
+    },
+    "detail": {
+      "title": "Factura {number}",
+      "titleFallback": "Factura",
+      "subtitle": "Revisa items y totales, emiti si hace falta y abri el PDF.",
+      "sections": {
+        "overview": "Resumen",
+        "lines": "Items"
+      },
+      "fields": {
+        "displayNumber": "Numero",
+        "docType": "Documento",
+        "mode": "Modo",
+        "customer": "Cliente",
+        "issuedAt": "Emitida",
+        "createdAt": "Creada",
+        "subtotal": "Subtotal",
+        "netSubtotal": "Neto",
+        "taxTotal": "IVA",
+        "total": "Total"
+      },
+      "lines": {
+        "columns": {
+          "product": "Producto",
+          "description": "Descripcion",
+          "quantity": "Cant",
+          "unitPrice": "Precio unit",
+          "vatRate": "IVA",
+          "netLineTotal": "Neto",
+          "vatAmount": "IVA",
+          "lineTotal": "Total"
+        },
+        "empty": "Sin items."
+      }
+    },
+    "errors": {
+      "notImplemented": "Todavia no implementado.",
+      "popupBlocked": "Popup bloqueado. Permiti popups para abrir el PDF.",
+      "docTypeARequiresCustomer": "El tipo A requiere un cliente."
     }
   },
   "Products": {
@@ -316,7 +575,8 @@
       "categorySelectPlaceholder": "Seleccionar categoria (opcional)",
       "categoryEmpty": "No hay categorias.",
       "categoryCreatePlaceholder": "Crear categoria (ej: Ropa)",
-      "categoryCreateAction": "Crear",
+      "categoryCreateAction": "Nueva categoria",
+      "categoryCreateOpen": "Crear con campos",
       "descriptionPlaceholder": "Notas internas o detalles...",
       "attributesTitle": "Atributos dinamicos",
       "attributesSubtitle": "Se cargan segun la categoria.",
@@ -551,6 +811,127 @@
       "customInvalid": "La key no es valida.",
       "columnsRequired": "Selecciona al menos una columna.",
       "success": "Descarga iniciada."
+    }
+  },
+  "Cart": {
+    "title": "Carrito",
+    "subtitle": "Agrega productos, vincula un cliente y concreta la venta.",
+    "tabs": {
+      "inventory": "Inventario",
+      "cart": "Carrito"
+    },
+    "actions": {
+      "checkout": "Concretar venta",
+      "checkoutLoading": "Procesando...",
+      "print": "Imprimir",
+      "newSale": "Nueva venta",
+      "createCustomer": "Crear cliente",
+      "removeItem": "Quitar item"
+    },
+    "labels": {
+      "finalConsumer": "Consumidor final"
+    },
+    "customerSelect": {
+      "triggerPlaceholder": "Consumidor final",
+      "triggerAria": "Cliente: {value}",
+      "searchPlaceholder": "Buscar clientes...",
+      "listTitle": "Clientes",
+      "empty": "Sin clientes.",
+      "noResults": "Sin coincidencias.",
+      "clear": "Limpiar"
+    },
+    "customerCreate": {
+      "title": "Crear cliente",
+      "subtitle": "Creacion rapida. Podes completar los datos despues.",
+      "fields": {
+        "name": "Nombre",
+        "namePlaceholder": "Ej: Juan Perez"
+      },
+      "success": "Cliente creado"
+    },
+    "sidebar": {
+      "customer": {
+        "title": "Cliente",
+        "hint": "Podes concretar una venta sin cliente (factura B)."
+      },
+      "invoice": {
+        "title": "Factura",
+        "docType": "Tipo de factura",
+        "docTypePlaceholder": "Seleccionar tipo",
+        "docTypeA": "A",
+        "docTypeB": "B",
+        "docTypeARequiresCustomer": "La factura A requiere un cliente.",
+        "hint": "La factura B se puede emitir sin cliente."
+      },
+      "totals": {
+        "title": "Totales"
+      }
+    },
+    "totals": {
+      "subtotal": "Subtotal",
+      "discount": "Descuento",
+      "tax": "IVA",
+      "total": "Total"
+    },
+    "inventory": {
+      "title": "Inventario completo",
+      "searchPlaceholder": "Buscar por codigo o nombre...",
+      "loaded": "Cargados: {count}",
+      "showing": "Mostrando: {count}",
+      "noPrice": "Sin precio",
+      "noPriceHint": "Este producto no tiene precio en esta sucursal.",
+      "noResults": {
+        "title": "Sin resultados",
+        "description": "Segui bajando para cargar mas o ajusta la busqueda."
+      },
+      "table": {
+        "columns": {
+          "code": "Codigo",
+          "name": "Producto",
+          "stock": "Stock",
+          "price": "Precio"
+        }
+      },
+      "actions": {
+        "add": "Agregar",
+        "loadMore": "Cargar mas",
+        "end": "Fin de lista"
+      }
+    },
+    "cartTable": {
+      "title": "Items del carrito",
+      "count": "{count} items",
+      "qtyDecrease": "Bajar cantidad",
+      "qtyIncrease": "Subir cantidad",
+      "qtyInput": "Cantidad",
+      "columns": {
+        "code": "Codigo",
+        "name": "Producto",
+        "qty": "Cant",
+        "unitPrice": "Precio unit",
+        "lineTotal": "Total"
+      }
+    },
+    "empty": {
+      "title": "Tu carrito esta vacio",
+      "description": "Agrega productos desde el inventario para iniciar una venta.",
+      "action": "Agregar productos"
+    },
+    "success": {
+      "title": "Venta concretada",
+      "saleCompleted": "Venta concretada",
+      "invoice": "Factura",
+      "total": "Total",
+      "ready": "Ya tenes un carrito nuevo listo para la proxima venta."
+    },
+    "errors": {
+      "popupBlocked": "Popup bloqueado. Permiti popups para abrir el PDF.",
+      "emptyCart": "Agrega al menos un item para concretar la venta.",
+      "cartNotEditable": "Este carrito no se puede editar.",
+      "docTypeARequiresCustomer": "La factura A requiere un cliente.",
+      "conflict": "No se pudo concretar la venta. Revisa stock y estado del carrito.",
+      "noBranchTitle": "Sin sucursal",
+      "noBranch": "Selecciona una sucursal activa para usar el carrito."
     }
   }
 }

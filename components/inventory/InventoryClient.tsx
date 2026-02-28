@@ -7,9 +7,9 @@ import { useTranslations } from "next-intl";
 import { AdjustStockDialog } from "@/components/inventory/AdjustStockDialog";
 import { InventoryTable } from "@/components/inventory/InventoryTable";
 import { TransferStockDialog } from "@/components/inventory/TransferStockDialog";
+import { ActiveBranchSelect } from "@/components/branches/ActiveBranchSelect";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { BranchInventoryItem } from "@/lib/inventory/types";
 import { useInventoryList } from "@/lib/inventory/hooks/use-inventory-list";
@@ -64,12 +64,10 @@ export function InventoryClient() {
           <div className="text-sm font-medium text-foreground">{t("activeBranchLabel")}</div>
           {sessionLoading ? (
             <Skeleton className="h-7 w-[340px] max-w-full" />
-          ) : activeBranch ? (
-            <Badge variant="secondary" className="max-w-full truncate">
-              {activeBranch.name}
-            </Badge>
           ) : (
-            <div className="text-sm text-muted-foreground">{t("noBranchSelected")}</div>
+            <div className="max-w-full md:w-[340px]">
+              <ActiveBranchSelect />
+            </div>
           )}
         </div>
 

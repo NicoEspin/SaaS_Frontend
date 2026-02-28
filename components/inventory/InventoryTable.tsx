@@ -100,7 +100,9 @@ export function InventoryTable({
                 <TableCell className="font-medium">{it.productName}</TableCell>
                 <TableCell>{it.categoryName ?? tc("labels.none")}</TableCell>
                 <TableCell className="text-right tabular-nums">{it.stockOnHand}</TableCell>
-                <TableCell className="text-right tabular-nums">{formatPrice(it.price)}</TableCell>
+                <TableCell className="text-right tabular-nums">
+                  {it.price === null ? tc("labels.none") : formatPrice(it.price)}
+                </TableCell>
                 <TableCell>
                   <div className="flex items-center justify-end gap-1">
                     <Button

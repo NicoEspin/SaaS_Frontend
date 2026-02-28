@@ -5,17 +5,22 @@ import {
   Moon,
   PanelLeftClose,
   PanelLeftOpen,
+  ShoppingCart,
   Settings,
   Sun,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { ActiveBranchSelect } from "@/components/branches/ActiveBranchSelect";
 import { Link, useRouter } from "@/i18n/navigation";
 import { useAuthStore } from "@/stores/auth-store";
 import { useThemeStore } from "@/stores/theme-store";
+import { useCartUiStore } from "@/stores/cart-ui-store";
+import { useCart } from "@/components/cart/cart-context";
 
 function initialsFromName(name: string) {
   const parts = name
@@ -42,7 +47,10 @@ export default function Navbar({ sidebarCollapsed, onToggleSidebar }: Props) {
   const mode = useThemeStore((s) => s.mode);
   const toggleMode = useThemeStore((s) => s.toggleMode);
 
-  const activeBranch = session?.activeBranch ?? session?.branches[0] ?? null;
+  const setCartOpen = useCartUiStore((s) => s.setOpen);
+  const { cart } = useCart();
+  const cartCount = cart?.items.length ?? 0;
+
   const userFullName = session?.user.fullName ?? null;
   const avatarText = userFullName ? initialsFromName(userFullName) : "?";
 
@@ -84,15 +92,9 @@ export default function Navbar({ sidebarCollapsed, onToggleSidebar }: Props) {
             </div>
           ) : session ? (
             <div className="hidden items-center gap-2 md:flex">
-              {activeBranch ? (
-                <Badge
-                  variant="secondary"
-                  className="max-w-56 truncate"
-                  aria-label={t("activeBranchAria", { branch: activeBranch.name })}
-                >
-                  {activeBranch.name}
-                </Badge>
-              ) : null}
+              <div className="w-[220px]">
+                <ActiveBranchSelect />
+              </div>
 
               {userFullName ? (
                 <div
@@ -118,6 +120,32 @@ export default function Navbar({ sidebarCollapsed, onToggleSidebar }: Props) {
               <Moon className="h-4 w-4" />
             )}
           </Button>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="relative">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="rounded-full"
+                  aria-label={t("openCart")}
+                  onClick={() => setCartOpen(true)}
+                >
+                  <ShoppingCart className="h-4 w-4" />
+                </Button>
+                {cartCount > 0 ? (
+                  <Badge
+                    variant="secondary"
+                    className="absolute -right-2 -top-2 h-5 min-w-5 justify-center rounded-full px-1 tabular-nums"
+                    aria-hidden="true"
+                  >
+                    {cartCount}
+                  </Badge>
+                ) : null}
+              </span>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">{t("openCart")}</TooltipContent>
+          </Tooltip>
 
           <div
             className="grid h-9 w-9 place-items-center rounded-full bg-primary text-sm font-semibold text-primary-foreground"

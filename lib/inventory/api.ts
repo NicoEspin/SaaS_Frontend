@@ -14,9 +14,20 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function toNumber(value: unknown): number | null {
-  if (typeof value !== "number") return null;
-  if (!Number.isFinite(value)) return null;
-  return value;
+  if (typeof value === "number") {
+    if (!Number.isFinite(value)) return null;
+    return value;
+  }
+
+  if (typeof value === "string") {
+    const s = value.trim();
+    if (!s) return null;
+    const n = Number(s);
+    if (!Number.isFinite(n)) return null;
+    return n;
+  }
+
+  return null;
 }
 
 function toString(value: unknown): string | null {
@@ -29,22 +40,36 @@ function toInventoryItem(value: unknown): BranchInventoryItem | null {
   if (!isRecord(value)) return null;
 
   const id = toString(value.id);
-  const productId = toString(value.productId);
-  const productCode = toString(value.productCode);
-  const productName = toString(value.productName);
-  const stockOnHand = toNumber(value.stockOnHand);
-  const price = toNumber(value.price);
 
-  const categoryNameRaw = value.categoryName;
-  const categoryName =
-    categoryNameRaw === null
+  const product = isRecord(value.product) ? value.product : null;
+
+  const productId = toString(value.productId) ?? (product ? toString(product.id) : null);
+  const productCode =
+    toString(value.productCode) ??
+    (product ? toString(product.code) ?? toString(product.sku) : null);
+  const productName = toString(value.productName) ?? (product ? toString(product.name) : null);
+
+  const stockOnHand = toNumber(value.stockOnHand);
+
+  const hasPrice = "price" in value;
+
+  const price =
+    hasPrice && value.price === null
       ? null
-      : typeof categoryNameRaw === "string"
-        ? categoryNameRaw
-        : null;
+      : toNumber(value.price) ??
+        (product ? (product.price === null ? null : toNumber(product.price)) : null);
+
+  const productCategory = product && isRecord(product.category) ? product.category : null;
+
+  const categoryName =
+    value.categoryName === null
+      ? null
+      : toString(value.categoryName) ??
+        (product ? toString(product.categoryName) : null) ??
+        (productCategory ? toString(productCategory.name) : null);
 
   if (!id || !productId || !productCode || !productName) return null;
-  if (stockOnHand === null || price === null) return null;
+  if (stockOnHand === null) return null;
 
   return {
     id,

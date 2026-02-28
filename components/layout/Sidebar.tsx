@@ -2,7 +2,16 @@
 
 import type { ComponentType } from "react";
 
-import { BarChart3, Boxes, Building2, LayoutGrid, Package, Settings } from "lucide-react";
+import {
+  BarChart3,
+  Boxes,
+  Building2,
+  LayoutGrid,
+  Package,
+  ReceiptText,
+  Settings,
+  Users,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { Link, usePathname } from "@/i18n/navigation";
@@ -41,6 +50,8 @@ export default function Sidebar({ collapsed }: Props) {
     ...(canSeeBranches ? [{ href: "/branches", label: t("branches"), Icon: Building2 }] : []),
     { href: "/inventory", label: t("inventory"), Icon: Boxes },
     { href: "/products", label: t("products"), Icon: Package },
+    { href: "/clients", label: t("clients"), Icon: Users },
+    { href: "/invoices", label: t("invoices"), Icon: ReceiptText },
     { href: "/reports", label: t("reports"), Icon: BarChart3 },
     { href: "/settings", label: t("settings"), Icon: Settings },
   ];

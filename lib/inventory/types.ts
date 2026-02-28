@@ -5,7 +5,7 @@ export type BranchInventoryItem = {
   productName: string;
   categoryName: string | null;
   stockOnHand: number;
-  price: number;
+  price: number | null;
 };
 
 export type InventoryListResult = {

@@ -5,6 +5,8 @@
     "branches": "Branches",
     "inventory": "Inventory",
     "products": "Products",
+    "clients": "Clients",
+    "invoices": "Invoices",
     "reports": "Reports",
     "settings": "Settings",
     "openSettings": "Open settings",
@@ -13,6 +15,7 @@
     "expandSidebar": "Expand sidebar",
     "themeToDark": "Switch to dark mode",
     "themeToLight": "Switch to light mode",
+    "openCart": "Open cart",
     "activeBranchAria": "Active branch: {branch}",
     "userAria": "Signed in as {name}"
   },
@@ -106,10 +109,128 @@
     },
     "productsTitle": "Products",
     "productsSubtitle": "Create and update your catalog.",
+    "clientsTitle": "Clients",
+    "clientsSubtitle": "Manage your customers and billing details.",
+    "invoicesTitle": "Invoices",
+    "invoicesSubtitle": "Review, issue, and download invoices.",
+    "invoiceTitle": "Invoice",
+    "invoiceSubtitle": "Details, lines, and PDF.",
     "reportsTitle": "Reports",
     "reportsSubtitle": "Track KPIs and exports.",
     "settingsTitle": "Settings",
     "settingsSubtitle": "Personalize your workspace."
+  },
+  "Clients": {
+    "actions": {
+      "new": "New client",
+      "activate": "Activate",
+      "deactivate": "Deactivate"
+    },
+    "filters": {
+      "title": "Filters",
+      "activeCount": "{count} active",
+      "q": "Search",
+      "qPlaceholder": "Name, code, tax id, email...",
+      "code": "Code",
+      "codePlaceholder": "e.g. C001",
+      "name": "Name",
+      "namePlaceholder": "e.g. Juan Perez",
+      "taxId": "Tax ID",
+      "taxIdPlaceholder": "e.g. 20123456789",
+      "email": "Email",
+      "emailPlaceholder": "e.g. juan@example.com",
+      "phone": "Phone",
+      "phonePlaceholder": "e.g. +54 11 5555-5555",
+      "isActive": "Status",
+      "advanced": "More filters"
+    },
+    "fields": {
+      "code": "Code",
+      "name": "Name",
+      "type": "Type",
+      "taxId": "Tax ID",
+      "taxIdType": "Tax ID type",
+      "vatCondition": "VAT condition",
+      "email": "Email",
+      "phone": "Phone",
+      "address": "Address",
+      "notes": "Notes",
+      "isActive": "Active",
+      "updatedAt": "Updated"
+    },
+    "placeholders": {
+      "name": "Full name or business name",
+      "code": "Optional code",
+      "taxId": "Optional tax id",
+      "email": "Optional email",
+      "phone": "Optional phone",
+      "address": "Optional address",
+      "notes": "Internal notes..."
+    },
+    "table": {
+      "title": "Clients",
+      "count": "{count} items"
+    },
+    "pagination": {
+      "loadMore": "Load more",
+      "moreAvailable": "More results available.",
+      "end": "End of results."
+    },
+    "form": {
+      "createTitle": "Create client",
+      "createSubtitle": "Fill in the details and save.",
+      "editTitle": "Edit client",
+      "editSubtitle": "Update the details and save.",
+      "sections": {
+        "basicsTitle": "Basics",
+        "basicsSubtitle": "Name, code, type, and status.",
+        "billingTitle": "Billing",
+        "billingSubtitle": "Tax id and VAT settings (optional).",
+        "contactTitle": "Contact",
+        "contactSubtitle": "Email, phone, and address.",
+        "notesTitle": "Notes",
+        "notesSubtitle": "Optional internal notes."
+      }
+    },
+    "validation": {
+      "nameRequired": "Name is required.",
+      "nameMax": "Name must be at most {max} characters.",
+      "invalidEmail": "Enter a valid email address."
+    },
+    "errors": {
+      "codeConflict": "That code already exists."
+    },
+    "success": {
+      "created": "Client created",
+      "updated": "Client updated",
+      "activated": "Client activated",
+      "deactivated": "Client deactivated"
+    },
+    "deactivate": {
+      "title": "Deactivate client",
+      "description": "You are about to deactivate {name} ({code}).",
+      "confirm": "Deactivate"
+    },
+    "enums": {
+      "type": {
+        "RETAIL": "Retail",
+        "WHOLESALE": "Wholesale"
+      },
+      "taxIdType": {
+        "CUIT": "CUIT",
+        "CUIL": "CUIL",
+        "DNI": "DNI",
+        "PASSPORT": "Passport",
+        "FOREIGN": "Foreign"
+      },
+      "vatCondition": {
+        "REGISTERED": "Registered",
+        "MONOTAX": "Monotax",
+        "EXEMPT": "Exempt",
+        "FINAL_CONSUMER": "Final consumer",
+        "FOREIGN": "Foreign"
+      }
+    }
   },
   "Dashboard": {
     "title": "Dashboard",
@@ -173,6 +294,7 @@
       "confirm": "Confirm",
       "cancel": "Cancel",
       "close": "Close",
+      "next": "Next",
       "refresh": "Refresh",
       "add": "Add",
       "edit": "Edit",
@@ -200,6 +322,27 @@
     "noResults": {
       "title": "No results",
       "description": "Try adjusting your search or filters."
+    }
+  },
+  "BranchSwitcher": {
+    "trigger": {
+      "placeholder": "Select branch",
+      "aria": "Active branch: {branch}"
+    },
+    "search": {
+      "placeholder": "Search branches..."
+    },
+    "list": {
+      "title": "Branches",
+      "empty": "No branches.",
+      "noResults": "No matches."
+    },
+    "success": {
+      "changed": "Active branch updated"
+    },
+    "errors": {
+      "forbidden": "You do not have permission to change the active branch.",
+      "invalid": "That branch is not valid."
     }
   },
   "Inventory": {
@@ -238,6 +381,122 @@
     "success": {
       "adjusted": "Stock adjusted",
       "transferred": "Stock transferred"
+    }
+  },
+  "Invoices": {
+    "activeBranchLabel": "Active branch",
+    "actions": {
+      "refreshBranches": "Refresh branches",
+      "refreshInvoices": "Refresh invoices",
+      "view": "View invoice",
+      "issue": "Issue",
+      "openPdf": "Open PDF",
+      "backToList": "Back to invoices"
+    },
+    "filters": {
+      "title": "Filters",
+      "activeCount": "{count} active",
+      "status": "Status",
+      "customerId": "Customer"
+    },
+    "customerSelect": {
+      "triggerPlaceholder": "Any customer",
+      "triggerAria": "Customer filter: {value}",
+      "searchPlaceholder": "Search customers...",
+      "listTitle": "Customers",
+      "any": "Any customer",
+      "clear": "Clear",
+      "empty": "No customers.",
+      "noResults": "No matches."
+    },
+    "table": {
+      "title": "Invoices",
+      "count": "{count} items",
+      "columns": {
+        "number": "Number",
+        "status": "Status",
+        "docType": "Doc",
+        "customer": "Customer",
+        "total": "Total",
+        "issuedAt": "Issued",
+        "createdAt": "Created",
+        "actions": "Actions"
+      }
+    },
+    "pagination": {
+      "loadMore": "Load more",
+      "moreAvailable": "More results available.",
+      "end": "End of results."
+    },
+    "labels": {
+      "finalConsumer": "Final consumer"
+    },
+    "enums": {
+      "status": {
+        "DRAFT": "Draft",
+        "ISSUED": "Issued"
+      },
+      "docType": {
+        "A": "A",
+        "B": "B"
+      },
+      "mode": {
+        "INTERNAL": "Internal",
+        "ARCA": "ARCA"
+      }
+    },
+    "issueDialog": {
+      "title": "Issue invoice",
+      "description": "Assigns a display number and marks the invoice as issued.",
+      "fields": {
+        "docType": "Document type",
+        "mode": "Mode"
+      },
+      "hints": {
+        "docTypeARequiresCustomer": "Type A requires a customer on the invoice.",
+        "modeArcaNotAvailable": "ARCA issuance is not available yet."
+      },
+      "submit": "Issue",
+      "success": "Invoice issued"
+    },
+    "detail": {
+      "title": "Invoice {number}",
+      "titleFallback": "Invoice",
+      "subtitle": "Review lines and totals, issue if needed, and open the PDF.",
+      "sections": {
+        "overview": "Overview",
+        "lines": "Lines"
+      },
+      "fields": {
+        "displayNumber": "Number",
+        "docType": "Document",
+        "mode": "Mode",
+        "customer": "Customer",
+        "issuedAt": "Issued",
+        "createdAt": "Created",
+        "subtotal": "Subtotal",
+        "netSubtotal": "Net",
+        "taxTotal": "VAT",
+        "total": "Total"
+      },
+      "lines": {
+        "columns": {
+          "product": "Product",
+          "description": "Description",
+          "quantity": "Qty",
+          "unitPrice": "Unit price",
+          "vatRate": "VAT",
+          "netLineTotal": "Net",
+          "vatAmount": "VAT amount",
+          "lineTotal": "Total"
+        },
+        "empty": "No lines."
+      }
+    },
+    "errors": {
+      "notImplemented": "Not implemented yet.",
+      "popupBlocked": "Popup blocked. Allow popups to open the PDF.",
+      "docTypeARequiresCustomer": "Type A requires a customer."
     }
   },
   "Products": {
@@ -316,7 +575,8 @@
       "categorySelectPlaceholder": "Select category (optional)",
       "categoryEmpty": "No categories.",
       "categoryCreatePlaceholder": "Create category (e.g. Apparel)",
-      "categoryCreateAction": "Create",
+      "categoryCreateAction": "New category",
+      "categoryCreateOpen": "Create with fields",
       "descriptionPlaceholder": "Internal notes or details...",
       "attributesTitle": "Dynamic attributes",
       "attributesSubtitle": "Loaded based on the selected category.",
@@ -551,6 +811,127 @@
       "customInvalid": "Key is not valid.",
       "columnsRequired": "Select at least one column.",
       "success": "Download started."
+    }
+  },
+  "Cart": {
+    "title": "Cart",
+    "subtitle": "Add products, link a customer, and checkout.",
+    "tabs": {
+      "inventory": "Inventory",
+      "cart": "Cart"
+    },
+    "actions": {
+      "checkout": "Checkout",
+      "checkoutLoading": "Processing...",
+      "print": "Print",
+      "newSale": "New sale",
+      "createCustomer": "Create customer",
+      "removeItem": "Remove item"
+    },
+    "labels": {
+      "finalConsumer": "Final consumer"
+    },
+    "customerSelect": {
+      "triggerPlaceholder": "Final consumer",
+      "triggerAria": "Customer: {value}",
+      "searchPlaceholder": "Search customers...",
+      "listTitle": "Customers",
+      "empty": "No customers.",
+      "noResults": "No matches.",
+      "clear": "Clear"
+    },
+    "customerCreate": {
+      "title": "Create customer",
+      "subtitle": "Quick creation. You can complete details later.",
+      "fields": {
+        "name": "Name",
+        "namePlaceholder": "e.g. Juan Perez"
+      },
+      "success": "Customer created"
+    },
+    "sidebar": {
+      "customer": {
+        "title": "Customer",
+        "hint": "You can checkout without a customer (type B)."
+      },
+      "invoice": {
+        "title": "Invoice",
+        "docType": "Document type",
+        "docTypePlaceholder": "Select type",
+        "docTypeA": "A",
+        "docTypeB": "B",
+        "docTypeARequiresCustomer": "Type A requires a customer.",
+        "hint": "Type B can be issued without a customer."
+      },
+      "totals": {
+        "title": "Totals"
+      }
+    },
+    "totals": {
+      "subtotal": "Subtotal",
+      "discount": "Discount",
+      "tax": "VAT",
+      "total": "Total"
+    },
+    "inventory": {
+      "title": "Full inventory",
+      "searchPlaceholder": "Search by code or name...",
+      "loaded": "Loaded: {count}",
+      "showing": "Showing: {count}",
+      "noPrice": "No price",
+      "noPriceHint": "This product has no price in this branch.",
+      "noResults": {
+        "title": "No results",
+        "description": "Keep scrolling to load more items or adjust the search."
+      },
+      "table": {
+        "columns": {
+          "code": "Code",
+          "name": "Product",
+          "stock": "Stock",
+          "price": "Price"
+        }
+      },
+      "actions": {
+        "add": "Add",
+        "loadMore": "Load more",
+        "end": "End of list"
+      }
+    },
+    "cartTable": {
+      "title": "Cart items",
+      "count": "{count} items",
+      "qtyDecrease": "Decrease quantity",
+      "qtyIncrease": "Increase quantity",
+      "qtyInput": "Quantity",
+      "columns": {
+        "code": "Code",
+        "name": "Product",
+        "qty": "Qty",
+        "unitPrice": "Unit price",
+        "lineTotal": "Total"
+      }
+    },
+    "empty": {
+      "title": "Your cart is empty",
+      "description": "Add products from inventory to start a sale.",
+      "action": "Add products"
+    },
+    "success": {
+      "title": "Sale completed",
+      "saleCompleted": "Sale completed",
+      "invoice": "Invoice",
+      "total": "Total",
+      "ready": "A new cart is ready for the next sale."
+    },
+    "errors": {
+      "popupBlocked": "Popup blocked. Allow popups to open the PDF.",
+      "emptyCart": "Add at least one item to checkout.",
+      "cartNotEditable": "This cart is not editable.",
+      "docTypeARequiresCustomer": "Type A requires a customer.",
+      "conflict": "Cannot complete the sale. Review stock and cart status.",
+      "noBranchTitle": "No branch selected",
+      "noBranch": "Select an active branch to use the cart."
     }
   }
 }

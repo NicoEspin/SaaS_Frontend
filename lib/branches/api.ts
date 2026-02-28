@@ -109,4 +109,8 @@ export const branchesApi = {
   async remove(id: string) {
     await apiClient.delete<void>(`/branches/${id}`);
   },
+
+  async setActive(dto: { branchId: string }) {
+    await apiClient.post<void>("/branches/active", dto);
+  },
 };

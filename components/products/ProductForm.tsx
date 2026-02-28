@@ -1,11 +1,12 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import axios from "axios";
 import { toast } from "sonner";
 
+import { CategoryCreatePanel } from "@/components/products/CategoryCreatePanel";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -34,6 +35,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
@@ -95,6 +103,7 @@ function coerceInitialAttrValue(v: ProductAttributeValue | undefined) {
 export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Props) {
   const t = useTranslations("Products");
   const tc = useTranslations("Common");
+  const ta = useTranslations("Attributes");
 
   const { submitting, createProduct, updateProduct } = useProductMutations();
 
@@ -159,25 +168,20 @@ export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Prop
     price: string;
   };
 
-  const stockRowSeq = useRef(0);
+  const stockRowSeq = useRef(1);
   const [initialStockEnabled, setInitialStockEnabled] = useState(false);
-  const [initialStockRows, setInitialStockRows] = useState<InitialStockRow[]>(() => {
-    stockRowSeq.current += 1;
-    return [
-      {
-        key: `stock-row-${stockRowSeq.current}`,
-        branchId: "",
-        stockOnHand: "",
-        price: "",
-      },
-    ];
-  });
+  const [initialStockRows, setInitialStockRows] = useState<InitialStockRow[]>([
+    {
+      key: "stock-row-1",
+      branchId: "",
+      stockOnHand: "",
+      price: "",
+    },
+  ]);
 
   const categories = useCategories({ limit: 100, enabled: open });
   const [missingCategory, setMissingCategory] = useState<Category | null>(null);
-  const [newCategoryName, setNewCategoryName] = useState("");
-  const [creatingCategory, setCreatingCategory] = useState(false);
-  const [categoryError, setCategoryError] = useState<string | null>(null);
+  const [categorySheetOpen, setCategorySheetOpen] = useState(false);
 
   const categoryOptions = useMemo(() => {
     const seen = new Set<string>();
@@ -187,25 +191,20 @@ export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Prop
       seen.add(c.id);
       out.push(c);
     }
-    if (missingCategory && !seen.has(missingCategory.id)) {
+    const selectedId = categoryId.trim();
+    if (missingCategory && missingCategory.id === selectedId && !seen.has(missingCategory.id)) {
       out.unshift(missingCategory);
     }
     return out;
-  }, [categories.items, missingCategory]);
+  }, [categories.items, categoryId, missingCategory]);
 
   useEffect(() => {
     if (!open) return;
     const id = categoryId.trim();
-    if (!id) {
-      setMissingCategory(null);
-      return;
-    }
+    if (!id) return;
 
     const inList = categories.items.some((c) => c.id === id);
-    if (inList) {
-      setMissingCategory(null);
-      return;
-    }
+    if (inList) return;
 
     let cancelled = false;
     void (async () => {
@@ -226,10 +225,26 @@ export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Prop
   const [errors, setErrors] = useState<FieldErrors>({});
 
   const [activeTab, setActiveTab] = useState<FormTab>("details");
+  const [maxUnlockedTabIndex, setMaxUnlockedTabIndex] = useState(() =>
+    mode === "create" ? 0 : 1
+  );
 
-  useEffect(() => {
-    if (mode !== "create" && activeTab === "stock") setActiveTab("details");
-  }, [activeTab, mode]);
+  const isCreateWizard = mode === "create";
+
+  function tabIndex(tab: FormTab) {
+    if (tab === "details") return 0;
+    if (tab === "attributes") return 1;
+    return 2;
+  }
+
+  function handleDialogOpenChange(nextOpen: boolean) {
+    if (!nextOpen) {
+      setCategorySheetOpen(false);
+      setActiveTab("details");
+      setMaxUnlockedTabIndex(mode === "create" ? 0 : 1);
+    }
+    onOpenChange(nextOpen);
+  }
 
   const { items: definitions, loading: defsLoading } = useAttributeDefinitions(
     categoryId.trim() ? categoryId.trim() : null
@@ -240,21 +255,47 @@ export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Prop
     [definitions]
   );
 
-  async function createCategoryFromForm() {
-    setCategoryError(null);
-    const name = newCategoryName.trim();
-    if (!name) return;
+  function validateDetailsStep(): boolean {
+    const next = { ...errors };
+    delete next.code;
+    delete next.name;
+    if (!code.trim()) next.code = t("validation.codeRequired");
+    if (!name.trim()) next.name = t("validation.nameRequired");
+    setErrors(next);
+    return !next.code && !next.name;
+  }
 
-    setCreatingCategory(true);
-    try {
-      const created = await categoriesApi.create({ name });
-      setNewCategoryName("");
-      await categories.refresh();
-      setCategoryId(created.id);
-    } catch (err) {
-      setCategoryError(getAxiosErrorMessage(err) ?? tc("errors.generic"));
-    } finally {
-      setCreatingCategory(false);
+  function validateAttributesStep(): boolean {
+    const next: FieldErrors = {};
+    for (const [k, v] of Object.entries(errors)) {
+      if (k.startsWith("attr.")) continue;
+      next[k] = v;
+    }
+
+    for (const def of sortedDefinitions) {
+      if (!def.isRequired) continue;
+      const v = attrs[def.key];
+      const missing = v === undefined || v === null || (typeof v === "string" && !v.trim());
+      if (missing) next[`attr.${def.key}`] = t("validation.attributeRequired");
+    }
+
+    setErrors(next);
+    return !Object.keys(next).some((k) => k.startsWith("attr."));
+  }
+
+  async function goNext() {
+    if (!isCreateWizard) return;
+    if (activeTab === "details") {
+      if (!validateDetailsStep()) return;
+      setMaxUnlockedTabIndex((v) => Math.max(v, 1));
+      setActiveTab("attributes");
+      return;
+    }
+    if (activeTab === "attributes") {
+      if (defsLoading) return;
+      if (!validateAttributesStep()) return;
+      setMaxUnlockedTabIndex((v) => Math.max(v, 2));
+      setActiveTab("stock");
     }
   }
 
@@ -377,7 +418,11 @@ export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Prop
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setFormError(null);
-    setCategoryError(null);
+
+    if (mode === "create" && activeTab !== "stock") {
+      await goNext();
+      return;
+    }
     if (!validate()) return;
 
     const cleanCategoryId = categoryId.trim();
@@ -430,7 +475,7 @@ export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Prop
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleDialogOpenChange}>
       <DialogContent className="flex max-h-[90vh] w-full flex-col gap-0 overflow-hidden p-0 sm:max-w-5xl">
         <div className="border-b border-border px-4 py-4 pr-12 sm:px-6 sm:py-5">
           <DialogHeader className="gap-1">
@@ -448,16 +493,34 @@ export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Prop
             value={activeTab}
             onValueChange={(v) => {
               if (!isFormTab(v)) return;
+              if (isCreateWizard && tabIndex(v) > maxUnlockedTabIndex) return;
               setActiveTab(v);
             }}
             className="flex min-h-0 flex-1 flex-col gap-0"
           >
             <div className="border-b border-border px-4 py-2 sm:px-6">
               <TabsList className="w-full justify-start" variant="line">
-                <TabsTrigger value="details">{t("form.tabs.details")}</TabsTrigger>
-                <TabsTrigger value="attributes">{t("form.tabs.attributes")}</TabsTrigger>
-                {mode === "create" ? (
-                  <TabsTrigger value="stock">{t("form.tabs.stock")}</TabsTrigger>
+                <TabsTrigger
+                  value="details"
+                  className="after:bg-primary data-[state=active]:text-primary dark:data-[state=active]:text-primary"
+                >
+                  {t("form.tabs.details")}
+                </TabsTrigger>
+                {!isCreateWizard || maxUnlockedTabIndex >= 1 ? (
+                  <TabsTrigger
+                    value="attributes"
+                    className="after:bg-primary data-[state=active]:text-primary dark:data-[state=active]:text-primary"
+                  >
+                    {t("form.tabs.attributes")}
+                  </TabsTrigger>
+                ) : null}
+                {isCreateWizard && maxUnlockedTabIndex >= 2 ? (
+                  <TabsTrigger
+                    value="stock"
+                    className="after:bg-primary data-[state=active]:text-primary dark:data-[state=active]:text-primary"
+                  >
+                    {t("form.tabs.stock")}
+                  </TabsTrigger>
                 ) : null}
               </TabsList>
             </div>
@@ -574,31 +637,22 @@ export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Prop
 
                     <div className="space-y-2">
                       <Label>{t("form.categoryCreateAction")}</Label>
-                      <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto]">
-                        <Input
-                          value={newCategoryName}
-                          onChange={(e) => setNewCategoryName(e.target.value)}
-                          placeholder={t("form.categoryCreatePlaceholder")}
-                          autoComplete="off"
-                        />
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => void createCategoryFromForm()}
-                          disabled={creatingCategory || !newCategoryName.trim()}
-                        >
-                          {creatingCategory ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                          {creatingCategory ? tc("actions.loading") : t("form.categoryCreateAction")}
-                        </Button>
-                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setCategorySheetOpen(true)}
+                      >
+                        <Plus className="h-4 w-4" />
+                        {t("form.categoryCreateOpen")}
+                      </Button>
                     </div>
 
-                    {categories.error || categoryError ? (
+                    {categories.error ? (
                       <Alert
                         variant="destructive"
                         className="border-destructive/30 bg-destructive/10"
                       >
-                        <AlertDescription>{categories.error ?? categoryError}</AlertDescription>
+                        <AlertDescription>{categories.error}</AlertDescription>
                       </Alert>
                     ) : null}
 
@@ -953,27 +1007,59 @@ export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Prop
                 </Alert>
               ) : null}
 
-            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-              <Button
-                type="button"
-                variant="outline"
-                disabled={submitting}
-                onClick={() => onOpenChange(false)}
-              >
-                {tc("actions.cancel")}
-              </Button>
-              <Button type="submit" disabled={submitting}>
-                {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                {submitting
-                  ? tc("actions.loading")
-                  : mode === "edit"
-                    ? tc("actions.save")
-                    : tc("actions.create")}
-              </Button>
+              <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={submitting}
+                  onClick={() => onOpenChange(false)}
+                >
+                  {tc("actions.cancel")}
+                </Button>
+
+                {mode === "create" && activeTab !== "stock" ? (
+                  <Button
+                    type="button"
+                    disabled={submitting || (activeTab === "attributes" && defsLoading)}
+                    onClick={() => void goNext()}
+                  >
+                    {tc("actions.next")}
+                  </Button>
+                ) : (
+                  <Button type="submit" disabled={submitting}>
+                    {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                    {submitting
+                      ? tc("actions.loading")
+                      : mode === "edit"
+                        ? tc("actions.save")
+                        : tc("actions.create")}
+                  </Button>
+                )}
               </div>
             </div>
           </Tabs>
         </form>
+
+        <Sheet open={categorySheetOpen} onOpenChange={setCategorySheetOpen}>
+          <SheetContent
+            side="right"
+            className="w-full gap-0 overflow-hidden sm:max-w-3xl"
+          >
+            <SheetHeader className="sr-only">
+              <SheetTitle>{ta("categories.createPanel.title")}</SheetTitle>
+              <SheetDescription>{ta("categories.createPanel.subtitle")}</SheetDescription>
+            </SheetHeader>
+            <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
+              <CategoryCreatePanel
+                onCancel={() => setCategorySheetOpen(false)}
+                onCreated={async (created) => {
+                  await categories.refresh();
+                  setCategoryId(created.id);
+                }}
+              />
+            </div>
+          </SheetContent>
+        </Sheet>
       </DialogContent>
     </Dialog>
   );
