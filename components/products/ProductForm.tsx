@@ -27,6 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
@@ -587,75 +588,8 @@ export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Prop
                   <CardHeader className="border-b">
                     <CardTitle>{t("form.sections.catalogTitle")}</CardTitle>
                     <CardDescription>{t("form.sections.catalogSubtitle")}</CardDescription>
-                    <CardAction>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => void categories.refresh()}
-                        disabled={categories.loading}
-                      >
-                        {categories.loading ? tc("actions.loading") : tc("actions.refresh")}
-                      </Button>
-                    </CardAction>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="product_category">{t("fields.category")}</Label>
-                      <Select
-                        value={categoryId.trim() ? categoryId.trim() : UNSET_SELECT_VALUE}
-                        onValueChange={(value) =>
-                          setCategoryId(value === UNSET_SELECT_VALUE ? "" : value)
-                        }
-                      >
-                        <SelectTrigger id="product_category" className="w-full">
-                          <SelectValue placeholder={t("form.categorySelectPlaceholder")} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value={UNSET_SELECT_VALUE}>{tc("labels.none")}</SelectItem>
-                          {categoryOptions.length === 0 ? (
-                            <SelectItem value="__empty__" disabled>
-                              {t("form.categoryEmpty")}
-                            </SelectItem>
-                          ) : null}
-                          {categoryOptions
-                            .slice()
-                            .sort((a, b) => a.name.localeCompare(b.name))
-                            .map((c) => (
-                              <SelectItem key={c.id} value={c.id}>
-                                <span className="flex w-full items-center justify-between gap-2">
-                                  <span className="truncate">{c.name}</span>
-                                  <span className="font-mono text-xs text-muted-foreground">
-                                    {c.id.slice(0, 6)}
-                                  </span>
-                                </span>
-                              </SelectItem>
-                            ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>{t("form.categoryCreateAction")}</Label>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => setCategorySheetOpen(true)}
-                      >
-                        <Plus className="h-4 w-4" />
-                        {t("form.categoryCreateOpen")}
-                      </Button>
-                    </div>
-
-                    {categories.error ? (
-                      <Alert
-                        variant="destructive"
-                        className="border-destructive/30 bg-destructive/10"
-                      >
-                        <AlertDescription>{categories.error}</AlertDescription>
-                      </Alert>
-                    ) : null}
-
                     <div className="space-y-2">
                       <Label htmlFor="product_description">{t("fields.description")}</Label>
                       <Textarea
@@ -678,15 +612,92 @@ export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Prop
                         ? t("form.attributesSubtitle")
                         : t("form.attributesNoCategory")}
                     </CardDescription>
-                    {defsLoading ? (
-                      <CardAction>
-                        <div className="text-xs text-muted-foreground">{tc("actions.loading")}</div>
-                      </CardAction>
-                    ) : null}
+                    <CardAction>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => void categories.refresh()}
+                        disabled={categories.loading}
+                      >
+                        {categories.loading ? tc("actions.loading") : tc("actions.refresh")}
+                      </Button>
+                    </CardAction>
                   </CardHeader>
 
-                  <CardContent className="space-y-4">
-                    {sortedDefinitions.length === 0 ? (
+                  <CardContent className="space-y-6">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <div className="space-y-2">
+                        <Label htmlFor="product_category">{t("fields.category")}</Label>
+                        <Select
+                          value={categoryId.trim() ? categoryId.trim() : UNSET_SELECT_VALUE}
+                          onValueChange={(value) =>
+                            setCategoryId(value === UNSET_SELECT_VALUE ? "" : value)
+                          }
+                        >
+                          <SelectTrigger id="product_category" className="w-full">
+                            <SelectValue placeholder={t("form.categorySelectPlaceholder")} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value={UNSET_SELECT_VALUE}>{tc("labels.none")}</SelectItem>
+                            {categoryOptions.length === 0 ? (
+                              <SelectItem value="__empty__" disabled>
+                                {t("form.categoryEmpty")}
+                              </SelectItem>
+                            ) : null}
+                            {categoryOptions
+                              .slice()
+                              .sort((a, b) => a.name.localeCompare(b.name))
+                              .map((c) => (
+                                <SelectItem key={c.id} value={c.id}>
+                                  <span className="flex w-full items-center justify-between gap-2">
+                                    <span className="truncate">{c.name}</span>
+                                    <span className="font-mono text-xs text-muted-foreground">
+                                      {c.id.slice(0, 6)}
+                                    </span>
+                                  </span>
+                                </SelectItem>
+                              ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>{t("form.categoryCreateAction")}</Label>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setCategorySheetOpen(true)}
+                        >
+                          <Plus className="mr-2 h-4 w-4" />
+                          {t("form.categoryCreateOpen")}
+                        </Button>
+                      </div>
+                    </div>
+
+                    {categories.error ? (
+                      <Alert
+                        variant="destructive"
+                        className="border-destructive/30 bg-destructive/10"
+                      >
+                        <AlertDescription>{categories.error}</AlertDescription>
+                      </Alert>
+                    ) : null}
+
+                    {!categoryId.trim() ? (
+                      <div className="rounded-lg border border-dashed border-border bg-muted/10 p-4 text-sm text-muted-foreground">
+                        {t("form.attributesNoCategory")}
+                      </div>
+                    ) : defsLoading ? (
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        {Array.from({ length: 6 }).map((_, i) => (
+                          <div key={`attr-skel-${i}`} className="space-y-2">
+                            <Skeleton className="h-4 w-32" />
+                            <Skeleton className="h-9 w-full" />
+                          </div>
+                        ))}
+                      </div>
+                    ) : sortedDefinitions.length === 0 ? (
                       <div className="text-sm text-muted-foreground">{t("form.attributesEmpty")}</div>
                     ) : (
                       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

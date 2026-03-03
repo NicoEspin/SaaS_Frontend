@@ -4,6 +4,7 @@ import { omitEmpty } from "@/lib/products/utils";
 import type {
   AdjustStockDto,
   BranchInventoryItem,
+  InventoryDisplayAttribute,
   InventoryListResult,
   ProductStockResult,
   TransferStockDto,
@@ -34,6 +35,38 @@ function toString(value: unknown): string | null {
   if (typeof value !== "string") return null;
   const s = value.trim();
   return s ? s : null;
+}
+
+function toInventoryDisplayAttribute(value: unknown): InventoryDisplayAttribute | null {
+  if (!isRecord(value)) return null;
+
+  const key = toString(value.key);
+  const label = toString(value.label);
+
+  if (!key || !label) return null;
+
+  const raw = value.value;
+  if (raw === null) return { key, label, value: null };
+  if (typeof raw === "string") return { key, label, value: raw };
+  if (typeof raw === "number" && Number.isFinite(raw)) return { key, label, value: raw };
+  if (typeof raw === "boolean") return { key, label, value: raw };
+
+  return { key, label, value: null };
+}
+
+function toInventoryDisplayAttributes(value: unknown): InventoryDisplayAttribute[] {
+  if (!Array.isArray(value)) return [];
+
+  const out: InventoryDisplayAttribute[] = [];
+  const seen = new Set<string>();
+  for (const raw of value) {
+    const a = toInventoryDisplayAttribute(raw);
+    if (!a) continue;
+    if (seen.has(a.key)) continue;
+    seen.add(a.key);
+    out.push(a);
+  }
+  return out;
 }
 
 function toInventoryItem(value: unknown): BranchInventoryItem | null {
@@ -71,12 +104,17 @@ function toInventoryItem(value: unknown): BranchInventoryItem | null {
   if (!id || !productId || !productCode || !productName) return null;
   if (stockOnHand === null) return null;
 
+  const attrsFromProduct = toInventoryDisplayAttributes(product ? product.displayAttributes : null);
+  const attrsFromRoot = toInventoryDisplayAttributes(value.displayAttributes);
+  const displayAttributes = attrsFromProduct.length ? attrsFromProduct : attrsFromRoot;
+
   return {
     id,
     productId,
     productCode,
     productName,
     categoryName,
+    displayAttributes,
     stockOnHand,
     price,
   };

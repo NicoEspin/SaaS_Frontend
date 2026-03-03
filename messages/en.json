@@ -680,6 +680,7 @@
       "code": "Code",
       "name": "Product",
       "category": "Category",
+      "attributes": "Attributes",
       "stock": "Stock",
       "price": "Price",
       "actions": "Actions"
@@ -791,6 +792,7 @@
         "displayNumber": "Number",
         "docType": "Document",
         "mode": "Mode",
+        "branch": "Branch",
         "customer": "Customer",
         "issuedAt": "Issued",
         "createdAt": "Created",
@@ -814,6 +816,7 @@
       }
     },
     "errors": {
+      "notFound": "Invoice not found.",
       "notImplemented": "Not implemented yet.",
       "popupBlocked": "Popup blocked. Allow popups to open the PDF.",
       "docTypeARequiresCustomer": "Type A requires a customer."
@@ -899,8 +902,8 @@
       "sections": {
         "basicsTitle": "Basics",
         "basicsSubtitle": "Code, name, and status.",
-        "catalogTitle": "Catalog",
-        "catalogSubtitle": "Category (optional) and description."
+        "catalogTitle": "Description",
+        "catalogSubtitle": "Optional internal notes and details."
       },
       "categorySelectPlaceholder": "Select category (optional)",
       "categoryEmpty": "No categories.",

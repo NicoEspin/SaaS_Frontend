@@ -190,26 +190,76 @@ export function ProductTable({
                       })
                     ) : (
                       <TableCell>
-                        <div className="flex flex-wrap gap-1">
-                          {p.displayAttributes.slice(0, 4).map((a) => {
-                            const rendered = renderAttrValue(a.value, labels);
-                            return (
-                              <Badge
-                                key={a.key}
-                                variant="outline"
-                                className={cn(
-                                  "max-w-[220px] truncate",
-                                  rendered.muted && "text-muted-foreground"
-                                )}
+                        {p.displayAttributes.length === 0 ? (
+                          <span className="text-sm text-muted-foreground">{tc("labels.none")}</span>
+                        ) : p.displayAttributes.length > 3 ? (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <div
+                                className="flex flex-wrap gap-1 cursor-help rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+                                tabIndex={0}
                               >
-                                {a.label}: {rendered.text}
-                              </Badge>
-                            );
-                          })}
-                          {p.displayAttributes.length > 4 ? (
-                            <Badge variant="secondary">+{p.displayAttributes.length - 4}</Badge>
-                          ) : null}
-                        </div>
+                                {p.displayAttributes.slice(0, 3).map((a) => {
+                                  const rendered = renderAttrValue(a.value, labels);
+                                  return (
+                                    <Badge
+                                      key={a.key}
+                                      variant="outline"
+                                      className={cn(
+                                        "max-w-[220px] truncate border-primary/20 bg-primary/10 text-primary",
+                                        rendered.muted && "text-primary/70"
+                                      )}
+                                    >
+                                      {a.label}: {rendered.text}
+                                    </Badge>
+                                  );
+                                })}
+                                <Badge
+                                  variant="outline"
+                                  className="border-primary/20 bg-primary/10 text-primary"
+                                >
+                                  ...
+                                </Badge>
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent side="top" align="start" className="max-w-[340px]">
+                              <div className="grid gap-1">
+                                {p.displayAttributes.slice(3).map((a) => {
+                                  const rendered = renderAttrValue(a.value, labels);
+                                  return (
+                                    <div
+                                      key={a.key}
+                                      className={cn(
+                                        "max-w-[320px] truncate",
+                                        rendered.muted ? "text-background/70" : "text-background"
+                                      )}
+                                    >
+                                      <span className="font-medium">{a.label}:</span> {rendered.text}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </TooltipContent>
+                          </Tooltip>
+                        ) : (
+                          <div className="flex flex-wrap gap-1">
+                            {p.displayAttributes.slice(0, 3).map((a) => {
+                              const rendered = renderAttrValue(a.value, labels);
+                              return (
+                                <Badge
+                                  key={a.key}
+                                  variant="outline"
+                                  className={cn(
+                                    "max-w-[220px] truncate border-primary/20 bg-primary/10 text-primary",
+                                    rendered.muted && "text-primary/70"
+                                  )}
+                                >
+                                  {a.label}: {rendered.text}
+                                </Badge>
+                              );
+                            })}
+                          </div>
+                        )}
                       </TableCell>
                     )}
 

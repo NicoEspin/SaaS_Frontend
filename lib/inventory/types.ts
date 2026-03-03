@@ -4,8 +4,15 @@ export type BranchInventoryItem = {
   productCode: string;
   productName: string;
   categoryName: string | null;
+  displayAttributes: InventoryDisplayAttribute[];
   stockOnHand: number;
   price: number | null;
+};
+
+export type InventoryDisplayAttribute = {
+  key: string;
+  label: string;
+  value: string | number | boolean | null;
 };
 
 export type InventoryListResult = {

@@ -6,7 +6,6 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
-import { ActiveBranchSelect } from "@/components/branches/ActiveBranchSelect";
 import { IssueInvoiceDialog } from "@/components/invoices/IssueInvoiceDialog";
 import { InvoiceStatusBadge } from "@/components/invoices/InvoiceStatusBadge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -75,12 +74,24 @@ export function InvoiceDetailClient({ invoiceId }: Props) {
   }, [hydrateSession, session, sessionLoading]);
 
   const branches = useMemo(() => session?.branches ?? [], [session?.branches]);
-  const activeBranch = useMemo(
-    () => session?.activeBranch ?? branches[0] ?? null,
-    [branches, session?.activeBranch]
+
+  const branchIdsToTry = useMemo(() => {
+    const ids = branches.map((b) => b.id);
+    const activeId = session?.activeBranch?.id ?? branches[0]?.id ?? null;
+    if (!activeId) return ids;
+    return [activeId, ...ids.filter((id) => id !== activeId)];
+  }, [branches, session?.activeBranch?.id]);
+
+  const { invoice, loading, error, refresh, branchId: invoiceBranchIdFromFetch } = useInvoice(
+    branchIdsToTry.length > 0 ? branchIdsToTry : null,
+    invoiceId
   );
 
-  const { invoice, loading, error, refresh } = useInvoice(activeBranch?.id ?? null, invoiceId);
+  const invoiceBranchId = invoice?.branchId ?? invoiceBranchIdFromFetch;
+  const invoiceBranch = useMemo(() => {
+    if (!invoiceBranchId) return null;
+    return branches.find((b) => b.id === invoiceBranchId) ?? null;
+  }, [branches, invoiceBranchId]);
 
   const [issueOpen, setIssueOpen] = useState(false);
 
@@ -92,9 +103,9 @@ export function InvoiceDetailClient({ invoiceId }: Props) {
   }, [invoice, t]);
 
   async function openPdf() {
-    if (!activeBranch) return;
+    if (!invoiceBranchId) return;
     try {
-      const res = await invoicesApi.getPdf(activeBranch.id, invoiceId, { variant: "internal" });
+      const res = await invoicesApi.getPdf(invoiceBranchId, invoiceId, { variant: "internal" });
       const url = URL.createObjectURL(res.blob);
       const w = window.open(url, "_blank", "noopener,noreferrer");
       if (!w) toast.error(t("errors.popupBlocked"));
@@ -130,20 +141,27 @@ export function InvoiceDetailClient({ invoiceId }: Props) {
             <Link href="/invoices">{t("actions.backToList")}</Link>
           </Button>
 
-          <Button variant="outline" onClick={() => void refresh()} disabled={!activeBranch || loading}>
+          <Button variant="outline" onClick={() => void refresh()} disabled={loading}>
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
             {loading ? tc("actions.loading") : tc("actions.refresh")}
           </Button>
 
-          {invoice?.status === "DRAFT" ? (
-            <Button onClick={() => setIssueOpen(true)} disabled={!activeBranch || loading}>
-              <ReceiptText className="h-4 w-4" />
-              {t("actions.issue")}
-            </Button>
+          {invoice ? (
+            invoice.status === "DRAFT" ? (
+              <Button onClick={() => setIssueOpen(true)} disabled={!invoiceBranchId || loading}>
+                <ReceiptText className="h-4 w-4" />
+                {t("actions.issue")}
+              </Button>
+            ) : (
+              <Button onClick={() => void openPdf()} disabled={!invoiceBranchId || loading}>
+                <FileText className="h-4 w-4" />
+                {t("actions.openPdf")}
+              </Button>
+            )
           ) : (
-            <Button onClick={() => void openPdf()} disabled={!activeBranch || loading}>
-              <FileText className="h-4 w-4" />
-              {t("actions.openPdf")}
+            <Button disabled variant="outline">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              {tc("actions.loading")}
             </Button>
           )}
         </div>
@@ -151,12 +169,15 @@ export function InvoiceDetailClient({ invoiceId }: Props) {
 
       <div className="flex flex-col gap-3 rounded-xl border border-border bg-background/60 p-4 backdrop-blur md:flex-row md:items-end md:justify-between">
         <div className="space-y-2">
-          <div className="text-sm font-medium text-foreground">{t("activeBranchLabel")}</div>
-          {sessionLoading ? (
+          <div className="text-sm font-medium text-foreground">{t("detail.fields.branch")}</div>
+          {sessionLoading || (loading && !invoice) ? (
             <Skeleton className="h-7 w-[340px] max-w-full" />
           ) : (
-            <div className="max-w-full md:w-[340px]">
-              <ActiveBranchSelect />
+            <div className="flex flex-wrap items-center gap-2">
+              <div className={cn("text-sm font-medium", !invoiceBranch && !invoiceBranchId && "text-muted-foreground")}>
+                {invoiceBranch?.name ?? invoiceBranchId ?? labels.none}
+              </div>
+
             </div>
           )}
         </div>
@@ -193,7 +214,7 @@ export function InvoiceDetailClient({ invoiceId }: Props) {
                   {t("detail.fields.displayNumber")}
                 </div>
                 <div className="text-sm font-medium">{invoice.displayNumber ?? labels.none}</div>
-                <div className="font-mono text-xs text-muted-foreground">{invoice.number}</div>
+            
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   <Badge variant="secondary">
                     {t("detail.fields.docType")}: {t(`enums.docType.${invoice.docType}`)}
@@ -317,7 +338,7 @@ export function InvoiceDetailClient({ invoiceId }: Props) {
         <IssueInvoiceDialog
           open
           onOpenChange={setIssueOpen}
-          branchId={activeBranch?.id ?? null}
+          branchId={invoiceBranchId ?? null}
           invoiceId={invoice.id}
           customerId={invoice.customerId}
           onIssued={async () => {
