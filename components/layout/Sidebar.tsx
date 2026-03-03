@@ -1,7 +1,7 @@
 "use client";
 
 import type { ComponentType } from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 
 import {
   BarChart3,
@@ -14,6 +14,7 @@ import {
   ReceiptText,
   Settings,
   Truck,
+  UserRound,
   Users,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -25,12 +26,10 @@ import { useAuthStore } from "@/stores/auth-store";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 type NavItem = {
   href: string;
@@ -46,23 +45,6 @@ export default function Sidebar({ collapsed }: Props) {
   const t = useTranslations("Nav");
   const pathname = usePathname();
   const logicalPath = stripLocaleFromPathname(pathname);
-
-  const [branchesMenuOpen, setBranchesMenuOpen] = useState(false);
-  const closeTimerRef = useRef<number | null>(null);
-
-  function clearCloseTimer() {
-    if (closeTimerRef.current) window.clearTimeout(closeTimerRef.current);
-    closeTimerRef.current = null;
-  }
-
-  function scheduleClose() {
-    clearCloseTimer();
-    closeTimerRef.current = window.setTimeout(() => setBranchesMenuOpen(false), 140);
-  }
-
-  useEffect(() => {
-    return () => clearCloseTimer();
-  }, []);
 
   const session = useAuthStore((s) => s.session);
   const sessionLoading = useAuthStore((s) => s.sessionLoading);
@@ -93,11 +75,18 @@ export default function Sidebar({ collapsed }: Props) {
     [t]
   );
 
-  const branchesGroupActive =
+  const branchesActive =
     logicalPath === "/branches" ||
-    logicalPath.startsWith("/branches/") ||
+    logicalPath.startsWith("/branches/");
+
+  const employeesActive =
     logicalPath === "/employees" ||
     logicalPath.startsWith("/employees/");
+
+  const branchesGroupActive = branchesActive || employeesActive;
+
+  const [branchesOpenManual, setBranchesOpenManual] = useState(false);
+  const branchesOpen = branchesGroupActive || branchesOpenManual;
 
   return (
     <aside
@@ -173,81 +162,98 @@ export default function Sidebar({ collapsed }: Props) {
           })()}
 
           {canSeeBranches ? (
-            <DropdownMenu
-              open={branchesMenuOpen}
-              onOpenChange={(next) => {
-                clearCloseTimer();
-                setBranchesMenuOpen(next);
-              }}
-            >
-              <div
-                onMouseEnter={() => {
-                  clearCloseTimer();
-                  setBranchesMenuOpen(true);
-                }}
-                onMouseLeave={scheduleClose}
-              >
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="ghost"
+            <Collapsible open={branchesOpen} onOpenChange={setBranchesOpenManual}>
+              <CollapsibleTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className={cn(
+                    "group w-full justify-start rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                    collapsed ? "h-10 justify-center px-2" : "h-10 gap-3 px-3",
+                    branchesGroupActive
+                      ? "bg-muted text-foreground hover:bg-muted"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  )}
+                  title={collapsed ? t("branches") : undefined}
+                  aria-label={t("branches")}
+                >
+                  <Building2
                     className={cn(
-                      "group w-full justify-start rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                      collapsed ? "h-10 justify-center px-2" : "h-10 gap-3 px-3",
+                      "h-4 w-4 shrink-0",
                       branchesGroupActive
-                        ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                        ? "text-foreground"
+                        : "text-muted-foreground group-hover:text-foreground"
+                    )}
+                  />
+
+                  {!collapsed ? (
+                    <span className="flex min-w-0 flex-1 items-center justify-between gap-2">
+                      <span className="truncate">{t("branches")}</span>
+                      <ChevronDown
+                        className={cn(
+                          "h-4 w-4 shrink-0 opacity-70 transition-transform",
+                          branchesOpen && "rotate-180"
+                        )}
+                      />
+                    </span>
+                  ) : null}
+                </Button>
+              </CollapsibleTrigger>
+
+              <CollapsibleContent className="data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down overflow-hidden">
+                <div className="mt-1 space-y-1">
+                  <Link
+                    href="/branches"
+                    aria-current={branchesActive ? "page" : undefined}
+                    title={collapsed ? t("branches") : undefined}
+                    className={cn(
+                      "group flex items-center rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                      collapsed
+                        ? "h-9 justify-center px-2"
+                        : "h-9 gap-3 pl-10 pr-3",
+                      branchesActive
+                        ? "bg-primary text-primary-foreground"
                         : "text-muted-foreground hover:bg-muted hover:text-foreground"
                     )}
-                    title={collapsed ? t("branches") : undefined}
-                    aria-label={t("branches")}
                   >
                     <Building2
                       className={cn(
                         "h-4 w-4 shrink-0",
-                        branchesGroupActive
+                        branchesActive
                           ? "text-primary-foreground"
                           : "text-muted-foreground group-hover:text-foreground"
                       )}
                     />
-                    {!collapsed ? (
-                      <span className="flex min-w-0 flex-1 items-center justify-between gap-2">
-                        <span className="truncate">{t("branches")}</span>
-                        <ChevronDown
-                          className={cn(
-                            "h-4 w-4 shrink-0 opacity-70 transition-transform",
-                            branchesMenuOpen && "rotate-180"
-                          )}
-                        />
-                      </span>
-                    ) : null}
-                  </Button>
-                </DropdownMenuTrigger>
+                    {!collapsed && <span className="truncate">{t("branches")}</span>}
+                  </Link>
 
-                <DropdownMenuContent
-                  align="start"
-                  side="right"
-                  sideOffset={collapsed ? 10 : 6}
-                  className="w-56"
-                  onMouseEnter={() => {
-                    clearCloseTimer();
-                    setBranchesMenuOpen(true);
-                  }}
-                  onMouseLeave={scheduleClose}
-                >
-                  <DropdownMenuItem asChild>
-                    <Link href="/branches" className="w-full">
-                      {t("branches")}
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link href="/employees" className="w-full">
-                      {t("employees")}
-                    </Link>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </div>
-            </DropdownMenu>
+                  <Link
+                    href="/employees"
+                    aria-current={employeesActive ? "page" : undefined}
+                    title={collapsed ? t("employees") : undefined}
+                    className={cn(
+                      "group flex items-center rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                      collapsed
+                        ? "h-9 justify-center px-2"
+                        : "h-9 gap-3 pl-10 pr-3",
+                      employeesActive
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    )}
+                  >
+                    <UserRound
+                      className={cn(
+                        "h-4 w-4 shrink-0",
+                        employeesActive
+                          ? "text-primary-foreground"
+                          : "text-muted-foreground group-hover:text-foreground"
+                      )}
+                    />
+                    {!collapsed && <span className="truncate">{t("employees")}</span>}
+                  </Link>
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
           ) : null}
 
           {items.map((item) => {
