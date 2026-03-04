@@ -868,8 +868,12 @@
       "attributes": "Atributos"
     },
     "initialStock": {
-      "toggle": "Definir stock inicial",
+      "toggle": "Stock inicial",
+      "optionalBadge": "Opcional",
       "subtitle": "Opcional. Completa sucursal, stock y precio.",
+      "optionalHint": "Si no lo necesitas, deja todo en blanco.",
+      "emptyTitle": "Sin stock inicial",
+      "emptyDescription": "Agrega una o mas sucursales para definir stock y precio de arranque.",
       "disabledHint": "Activalo para precargar stock y precio por sucursal.",
       "branch": "Sucursal",
       "addBranch": "Agregar sucursal",

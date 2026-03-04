@@ -8,6 +8,8 @@ import { toast } from "sonner";
 
 import { CategoryCreatePanel } from "@/components/products/CategoryCreatePanel";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { EmptyState } from "@/components/empty-state/EmptyState";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -169,16 +171,8 @@ export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Prop
     price: string;
   };
 
-  const stockRowSeq = useRef(1);
-  const [initialStockEnabled, setInitialStockEnabled] = useState(false);
-  const [initialStockRows, setInitialStockRows] = useState<InitialStockRow[]>([
-    {
-      key: "stock-row-1",
-      branchId: "",
-      stockOnHand: "",
-      price: "",
-    },
-  ]);
+  const stockRowSeq = useRef(0);
+  const [initialStockRows, setInitialStockRows] = useState<InitialStockRow[]>([]);
 
   const categories = useCategories({ limit: 100, enabled: open });
   const [missingCategory, setMissingCategory] = useState<Category | null>(null);
@@ -318,10 +312,7 @@ export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Prop
   }
 
   function removeInitialStockRow(key: string) {
-    setInitialStockRows((rows) => {
-      const next = rows.filter((r) => r.key !== key);
-      return next.length ? next : rows;
-    });
+    setInitialStockRows((rows) => rows.filter((r) => r.key !== key));
   }
 
   function setInitialStockRow(key: string, patch: Partial<InitialStockRow>) {
@@ -349,7 +340,6 @@ export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Prop
 
   function buildInitialStockPayload(): ProductCreateDto["initialStock"] {
     if (mode !== "create") return undefined;
-    if (!initialStockEnabled) return undefined;
 
     const deduped = new Map<string, { branchId: string; stockOnHand: number; price: number }>();
 
@@ -379,7 +369,7 @@ export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Prop
       if (missing) next[`attr.${def.key}`] = t("validation.attributeRequired");
     }
 
-    if (mode === "create" && initialStockEnabled) {
+    if (mode === "create") {
       let invalidCount = 0;
       for (const row of initialStockRows) {
         const hasAny = Boolean(
@@ -520,7 +510,10 @@ export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Prop
                     value="stock"
                     className="after:bg-primary data-[state=active]:text-primary dark:data-[state=active]:text-primary"
                   >
-                    {t("form.tabs.stock")}
+                    <span className="inline-flex items-center gap-2">
+                      {t("form.tabs.stock")}
+                      <Badge variant="secondary">{t("initialStock.optionalBadge")}</Badge>
+                    </span>
                   </TabsTrigger>
                 ) : null}
               </TabsList>
@@ -829,159 +822,176 @@ export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Prop
 
               {mode === "create" ? (
                 <TabsContent value="stock" className="space-y-6">
-                  <div className="rounded-lg border border-border p-4">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="space-y-1">
-                        <Label htmlFor="product_initialStock" className="text-sm font-semibold">
-                          {t("initialStock.toggle")}
-                        </Label>
-                        <p className="text-sm text-muted-foreground">{t("initialStock.subtitle")}</p>
-                      </div>
-                      <Switch
-                        id="product_initialStock"
-                        checked={initialStockEnabled}
-                        onCheckedChange={(checked) => setInitialStockEnabled(checked)}
-                      />
-                    </div>
-                  </div>
+                  <Card>
+                    <CardHeader className="border-b">
+                      <CardTitle className="flex items-center gap-2">
+                        {t("initialStock.toggle")}
+                        <Badge variant="secondary">{t("initialStock.optionalBadge")}</Badge>
+                      </CardTitle>
+                      <CardDescription>{t("initialStock.subtitle")}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <p className="text-sm text-muted-foreground">{t("initialStock.optionalHint")}</p>
 
-                  {errors.initialStock ? (
-                    <Alert variant="destructive" className="border-destructive/30 bg-destructive/10">
-                      <AlertDescription>{errors.initialStock}</AlertDescription>
-                    </Alert>
-                  ) : null}
+                      {errors.initialStock ? (
+                        <Alert
+                          variant="destructive"
+                          className="border-destructive/30 bg-destructive/10"
+                        >
+                          <AlertDescription>{errors.initialStock}</AlertDescription>
+                        </Alert>
+                      ) : null}
 
-                  {initialStockEnabled ? (
-                    <div className="space-y-4">
                       {branches.error ? (
-                        <Alert variant="destructive" className="border-destructive/30 bg-destructive/10">
+                        <Alert
+                          variant="destructive"
+                          className="border-destructive/30 bg-destructive/10"
+                        >
                           <AlertDescription>{branches.error}</AlertDescription>
                         </Alert>
                       ) : null}
 
-                      <div className="rounded-lg border border-border">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>{t("initialStock.branch")}</TableHead>
-                              <TableHead className="w-[160px]">{t("initialStock.stockOnHand")}</TableHead>
-                              <TableHead className="w-[160px]">{t("initialStock.price")}</TableHead>
-                              <TableHead className="w-[120px] text-right">{tc("labels.actions")}</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {initialStockRows.map((row) => {
-                              const selectedByOthers = new Set(
-                                initialStockRows
-                                  .filter((r) => r.key !== row.key)
-                                  .map((r) => r.branchId.trim())
-                                  .filter(Boolean)
-                              );
+                      {initialStockRows.length ? (
+                        <div className="rounded-lg border border-border">
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead>{t("initialStock.branch")}</TableHead>
+                                <TableHead className="w-[160px]">
+                                  {t("initialStock.stockOnHand")}
+                                </TableHead>
+                                <TableHead className="w-[160px]">{t("initialStock.price")}</TableHead>
+                                <TableHead className="w-[120px] text-right">
+                                  {tc("labels.actions")}
+                                </TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {initialStockRows.map((row) => {
+                                const selectedByOthers = new Set(
+                                  initialStockRows
+                                    .filter((r) => r.key !== row.key)
+                                    .map((r) => r.branchId.trim())
+                                    .filter(Boolean)
+                                );
 
-                              const branchSelectId = `stock_branch_${row.key}`;
-                              const stockId = `stock_onhand_${row.key}`;
-                              const priceId = `stock_price_${row.key}`;
+                                const branchSelectId = `stock_branch_${row.key}`;
+                                const stockId = `stock_onhand_${row.key}`;
+                                const priceId = `stock_price_${row.key}`;
 
-                              const rowError = errors[`stock.${row.key}`];
+                                const rowError = errors[`stock.${row.key}`];
 
-                              return (
-                                <Fragment key={row.key}>
-                                  <TableRow>
-                                    <TableCell className="align-top">
-                                      <Label htmlFor={branchSelectId} className="sr-only">
-                                        {t("initialStock.branch")}
-                                      </Label>
-                                      <Select
-                                        value={row.branchId.trim() ? row.branchId.trim() : "__unset__"}
-                                        onValueChange={(v) =>
-                                          setInitialStockRow(row.key, {
-                                            branchId: v === "__unset__" ? "" : v,
-                                          })
-                                        }
-                                        disabled={branches.loading || branches.items.length === 0}
-                                      >
-                                        <SelectTrigger id={branchSelectId} className="w-full">
-                                          <SelectValue placeholder={tc("labels.select")} />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                          <SelectItem value="__unset__">{tc("labels.none")}</SelectItem>
-                                          {branches.items.map((b) => (
-                                            <SelectItem
-                                              key={b.id}
-                                              value={b.id}
-                                              disabled={selectedByOthers.has(b.id)}
-                                            >
-                                              {b.name}
-                                            </SelectItem>
-                                          ))}
-                                        </SelectContent>
-                                      </Select>
-                                    </TableCell>
-
-                                    <TableCell className="align-top">
-                                      <Label htmlFor={stockId} className="sr-only">
-                                        {t("initialStock.stockOnHand")}
-                                      </Label>
-                                      <Input
-                                        id={stockId}
-                                        type="number"
-                                        min={0}
-                                        step={1}
-                                        inputMode="numeric"
-                                        value={row.stockOnHand}
-                                        onChange={(e) =>
-                                          setInitialStockRow(row.key, { stockOnHand: e.target.value })
-                                        }
-                                        aria-invalid={Boolean(rowError)}
-                                      />
-                                    </TableCell>
-
-                                    <TableCell className="align-top">
-                                      <Label htmlFor={priceId} className="sr-only">
-                                        {t("initialStock.price")}
-                                      </Label>
-                                      <Input
-                                        id={priceId}
-                                        type="number"
-                                        min={0}
-                                        step={0.01}
-                                        inputMode="decimal"
-                                        value={row.price}
-                                        onChange={(e) =>
-                                          setInitialStockRow(row.key, { price: e.target.value })
-                                        }
-                                        aria-invalid={Boolean(rowError)}
-                                      />
-                                    </TableCell>
-
-                                    <TableCell className="align-top text-right">
-                                      <Button
-                                        type="button"
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => removeInitialStockRow(row.key)}
-                                        disabled={initialStockRows.length <= 1}
-                                      >
-                                        {t("initialStock.remove")}
-                                      </Button>
-                                    </TableCell>
-                                  </TableRow>
-
-                                  {rowError ? (
+                                return (
+                                  <Fragment key={row.key}>
                                     <TableRow>
-                                      <TableCell colSpan={4} className="pt-0">
-                                        <p className="text-sm text-destructive" role="alert">
-                                          {rowError}
-                                        </p>
+                                      <TableCell className="align-top">
+                                        <Label htmlFor={branchSelectId} className="sr-only">
+                                          {t("initialStock.branch")}
+                                        </Label>
+                                        <Select
+                                          value={row.branchId.trim() ? row.branchId.trim() : "__unset__"}
+                                          onValueChange={(v) =>
+                                            setInitialStockRow(row.key, {
+                                              branchId: v === "__unset__" ? "" : v,
+                                            })
+                                          }
+                                          disabled={branches.loading || branches.items.length === 0}
+                                        >
+                                          <SelectTrigger id={branchSelectId} className="w-full">
+                                            <SelectValue placeholder={tc("labels.select")} />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            <SelectItem value="__unset__">{tc("labels.none")}</SelectItem>
+                                            {branches.items.map((b) => (
+                                              <SelectItem
+                                                key={b.id}
+                                                value={b.id}
+                                                disabled={selectedByOthers.has(b.id)}
+                                              >
+                                                {b.name}
+                                              </SelectItem>
+                                            ))}
+                                          </SelectContent>
+                                        </Select>
+                                      </TableCell>
+
+                                      <TableCell className="align-top">
+                                        <Label htmlFor={stockId} className="sr-only">
+                                          {t("initialStock.stockOnHand")}
+                                        </Label>
+                                        <Input
+                                          id={stockId}
+                                          type="number"
+                                          min={0}
+                                          step={1}
+                                          inputMode="numeric"
+                                          value={row.stockOnHand}
+                                          onChange={(e) =>
+                                            setInitialStockRow(row.key, { stockOnHand: e.target.value })
+                                          }
+                                          aria-invalid={Boolean(rowError)}
+                                        />
+                                      </TableCell>
+
+                                      <TableCell className="align-top">
+                                        <Label htmlFor={priceId} className="sr-only">
+                                          {t("initialStock.price")}
+                                        </Label>
+                                        <Input
+                                          id={priceId}
+                                          type="number"
+                                          min={0}
+                                          step={0.01}
+                                          inputMode="decimal"
+                                          value={row.price}
+                                          onChange={(e) =>
+                                            setInitialStockRow(row.key, { price: e.target.value })
+                                          }
+                                          aria-invalid={Boolean(rowError)}
+                                        />
+                                      </TableCell>
+
+                                      <TableCell className="align-top text-right">
+                                        <Button
+                                          type="button"
+                                          variant="outline"
+                                          size="sm"
+                                          onClick={() => removeInitialStockRow(row.key)}
+                                        >
+                                          {t("initialStock.remove")}
+                                        </Button>
                                       </TableCell>
                                     </TableRow>
-                                  ) : null}
-                                </Fragment>
-                              );
-                            })}
-                          </TableBody>
-                        </Table>
-                      </div>
+
+                                    {rowError ? (
+                                      <TableRow>
+                                        <TableCell colSpan={4} className="pt-0">
+                                          <p className="text-sm text-destructive" role="alert">
+                                            {rowError}
+                                          </p>
+                                        </TableCell>
+                                      </TableRow>
+                                    ) : null}
+                                  </Fragment>
+                                );
+                              })}
+                            </TableBody>
+                          </Table>
+                        </div>
+                      ) : (
+                        <div className="rounded-lg border border-dashed border-border bg-muted/10">
+                          <EmptyState
+                            title={t("initialStock.emptyTitle")}
+                            description={t("initialStock.emptyDescription")}
+                            action={{
+                              label: t("initialStock.addBranch"),
+                              onClick: addInitialStockRow,
+                              variant: "outline",
+                            }}
+                            className="py-10"
+                          />
+                        </div>
+                      )}
 
                       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                         <Button
@@ -1001,12 +1011,8 @@ export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Prop
                           {branches.loading ? tc("actions.loading") : tc("actions.refresh")}
                         </Button>
                       </div>
-                    </div>
-                  ) : (
-                    <div className="rounded-lg border border-dashed border-border bg-muted/10 p-4 text-sm text-muted-foreground">
-                      {t("initialStock.disabledHint")}
-                    </div>
-                  )}
+                    </CardContent>
+                  </Card>
                 </TabsContent>
               ) : null}
             </div>

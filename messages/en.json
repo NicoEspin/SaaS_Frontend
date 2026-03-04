@@ -868,8 +868,12 @@
       "attributes": "Attributes"
     },
     "initialStock": {
-      "toggle": "Set initial stock",
+      "toggle": "Initial stock",
+      "optionalBadge": "Optional",
       "subtitle": "Optional. Fill branch, stock and price.",
+      "optionalHint": "If you don't need it, leave everything blank.",
+      "emptyTitle": "No initial stock",
+      "emptyDescription": "Add one or more branches to set starting stock and price.",
       "disabledHint": "Enable this to preload stock and price by branch.",
       "branch": "Branch",
       "addBranch": "Add branch",
