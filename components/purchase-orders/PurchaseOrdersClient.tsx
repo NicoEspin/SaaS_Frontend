@@ -25,12 +25,23 @@ function uiToQueryFilters(ui: PurchaseOrdersUiFilters): Omit<PurchaseOrdersListQ
   };
 }
 
-export function PurchaseOrdersClient() {
+type Props = {
+  initialSupplierId?: string | null;
+};
+
+export function PurchaseOrdersClient({ initialSupplierId }: Props) {
   const t = useTranslations("PurchaseOrders");
   const tc = useTranslations("Common");
 
-  const [uiFilters, setUiFilters] = useState<PurchaseOrdersUiFilters>(EMPTY_UI_FILTERS);
-  const [appliedFilters, setAppliedFilters] = useState<Omit<PurchaseOrdersListQuery, "limit" | "cursor">>({});
+  const [uiFilters, setUiFilters] = useState<PurchaseOrdersUiFilters>(() => ({
+    ...EMPTY_UI_FILTERS,
+    supplierId: initialSupplierId?.trim() ? initialSupplierId.trim() : null,
+  }));
+
+  const [appliedFilters, setAppliedFilters] = useState<Omit<PurchaseOrdersListQuery, "limit" | "cursor">>(() => {
+    const clean = initialSupplierId?.trim() ? initialSupplierId.trim() : null;
+    return clean ? { supplierId: clean } : {};
+  });
 
   const list = usePurchaseOrdersList({ limit: 10, initialFilters: appliedFilters });
 

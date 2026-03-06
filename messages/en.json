@@ -207,6 +207,12 @@
       "noResults": "No results.",
       "clear": "Clear",
       "any": "Any supplier"
+    },
+    "activePurchaseOrders": {
+      "badge": "Active orders: {count}",
+      "viewAll": "View purchase orders",
+      "viewAllAria": "View purchase orders for {name}",
+      "openOrderAria": "Open purchase order {number}"
     }
   },
   "PurchaseOrders": {
@@ -255,12 +261,14 @@
       "lines": {
         "emptyTitle": "No lines",
         "emptyDescription": "This purchase order has no items.",
+        "totalLabel": "Total",
         "columns": {
           "product": "Item",
           "quantityOrdered": "Ordered",
           "receivedQty": "Received",
           "pendingQty": "Pending",
-          "agreedUnitCost": "Agreed cost"
+          "agreedUnitCost": "Agreed cost",
+          "lineTotal": "Total"
         }
       },
       "receipts": {
@@ -343,27 +351,15 @@
         "lineSubtitle": "Quantity and cost per item.",
         "modeExisting": "Existing product",
         "modeNew": "New product",
-        "newProductHint": "Enter the new product details below.",
-        "newProductActiveHint": "New products are active by default.",
-        "noAttributes": "No attribute definitions for this category.",
+        "newProductHint": "Create the product using the same Products form. After saving, it will be selected in this line.",
+        "actions": {
+          "createProduct": "Create product"
+        },
         "fields": {
           "mode": "Type",
           "product": "Product",
           "quantityOrdered": "Quantity",
-          "agreedUnitCost": "Agreed unit cost",
-          "customAttributes": "Custom attributes (JSON)"
-        },
-        "placeholders": {
-          "customAttributes": "{\n  \"color\": \"red\"\n}"
-        },
-        "hints": {
-          "customAttributes": "Optional. Must be a JSON object and will be merged with category attributes."
-        },
-        "attributes": {
-          "required": "Required",
-          "optional": "Optional",
-          "pickOne": "Pick one",
-          "unset": "Unset"
+          "agreedUnitCost": "Agreed unit cost"
         }
       },
       "validation": {
@@ -373,9 +369,7 @@
         "qtyRequired": "Enter a quantity greater than 0.",
         "costRequired": "Enter a valid cost.",
         "productRequired": "Select a product.",
-        "newCodeRequired": "Product code is required.",
-        "newNameRequired": "Product name is required.",
-        "customAttributesInvalid": "Invalid JSON. Provide an object like { \"key\": \"value\" }."
+        "newProductRequired": "Create the product to continue."
       },
       "errors": {
         "fixForm": "Fix the highlighted fields."
@@ -402,7 +396,12 @@
       },
       "labels": {
         "pendingQty": "{qty} pending",
-        "receivingQty": "{qty} receiving"
+        "receivingQty": "{qty} receiving",
+        "selectAll": "Select all"
+      },
+      "aria": {
+        "selectAll": "Select all items",
+        "selectLine": "Select full quantity for {item}"
       },
       "hints": {
         "pending": "You can only receive up to the pending quantity for each item."

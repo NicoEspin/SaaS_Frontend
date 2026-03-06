@@ -4,11 +4,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 
 import { suppliersApi } from "@/lib/suppliers/api";
-import type { Supplier, SuppliersListQuery } from "@/lib/suppliers/types";
+import type {
+  SupplierWithActivePurchaseOrders,
+  SuppliersWithActivePurchaseOrdersListQuery,
+} from "@/lib/suppliers/types";
 import { getAxiosErrorMessage } from "@/lib/products/utils";
 
 type State = {
-  items: Supplier[];
+  items: SupplierWithActivePurchaseOrders[];
   nextCursor: string | null;
   loading: boolean;
   loadingMore: boolean;
@@ -17,12 +20,14 @@ type State = {
 
 export function useSuppliersList(options?: {
   limit?: number;
-  initialFilters?: Omit<SuppliersListQuery, "limit" | "cursor">;
+  initialFilters?: Omit<SuppliersWithActivePurchaseOrdersListQuery, "limit" | "cursor">;
 }) {
   const tc = useTranslations("Common");
   const limit = options?.limit ?? 10;
 
-  const [filters, setFilters] = useState<Omit<SuppliersListQuery, "limit" | "cursor">>(
+  const [filters, setFilters] = useState<
+    Omit<SuppliersWithActivePurchaseOrdersListQuery, "limit" | "cursor">
+  >(
     options?.initialFilters ?? {}
   );
 
@@ -50,11 +55,12 @@ export function useSuppliersList(options?: {
       }));
 
       try {
-        const res = await suppliersApi.suppliers.list(
+        const res = await suppliersApi.suppliers.listWithActivePurchaseOrders(
           {
             ...filters,
             limit,
             cursor: cursor ?? undefined,
+            maxOrders: 3,
           },
           { signal: controller.signal }
         );
@@ -64,7 +70,7 @@ export function useSuppliersList(options?: {
         setState((s) => {
           const nextItems = mode === "replace" ? res.items : [...s.items, ...res.items];
           const seen = new Set<string>();
-          const deduped: Supplier[] = [];
+          const deduped: SupplierWithActivePurchaseOrders[] = [];
           for (const item of nextItems) {
             if (seen.has(item.id)) continue;
             seen.add(item.id);

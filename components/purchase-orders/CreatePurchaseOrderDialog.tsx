@@ -1,12 +1,13 @@
 "use client";
 
 import { Loader2, Plus, Trash2 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
 import { BranchSelect } from "@/components/branches/BranchSelect";
 import { EmptyState } from "@/components/empty-state/EmptyState";
+import { ProductForm } from "@/components/products/ProductForm";
 import { ProductSelect } from "@/components/products/ProductSelect";
 import { SupplierSelect } from "@/components/suppliers/SupplierSelect";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -30,24 +31,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "@/i18n/navigation";
-import { useCategories } from "@/lib/categories/hooks/use-categories";
-import type { Category } from "@/lib/categories/types";
-import { useAttributeDefinitions } from "@/lib/products/hooks/use-attribute-definitions";
-import type { ProductAttributeDefinition } from "@/lib/products/types";
 import {
   purchaseOrderCreateDtoSchema,
   type PurchaseOrderCreateDto,
   type PurchaseOrderCreateItem,
-  type PurchaseOrderNewProduct,
 } from "@/lib/purchase-orders/types";
 import { getAxiosErrorMessage } from "@/lib/products/utils";
 import { usePurchaseOrderMutations } from "@/lib/purchase-orders/hooks/use-purchase-order-mutations";
-import { cn } from "@/lib/utils";
 
 type LineMode = "existing" | "new";
 
@@ -57,23 +49,13 @@ type LineDraft = {
   productId: string | null;
   quantityOrdered: string;
   agreedUnitCost: string;
-  newProduct: {
-    code: string;
-    name: string;
-    categoryId: string;
-    isActive: boolean;
-    attributes: Record<string, unknown>;
-    customAttributesJson: string;
-  };
 };
 
 type LineErrors = Partial<{
   productId: string;
   quantityOrdered: string;
   agreedUnitCost: string;
-  newCode: string;
-  newName: string;
-  customAttributesJson: string;
+  newProduct: string;
 }>;
 
 type FieldErrors = {
@@ -113,15 +95,12 @@ function coerceNumber(value: string) {
   return n;
 }
 
-const UNSET_SELECT_VALUE = "__unset__";
-
 export function CreatePurchaseOrderDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   const t = useTranslations("PurchaseOrders");
   const tc = useTranslations("Common");
 
   const router = useRouter();
   const muts = usePurchaseOrderMutations();
-  const categories = useCategories({ limit: 200, enabled: open });
 
   const [supplierId, setSupplierId] = useState<string | null>(null);
   const [branchId, setBranchId] = useState<string | null>(null);
@@ -146,26 +125,12 @@ export function CreatePurchaseOrderDialog({ open, onOpenChange }: { open: boolea
         productId: null,
         quantityOrdered: "1",
         agreedUnitCost: "0",
-        newProduct: {
-          code: "",
-          name: "",
-          categoryId: "",
-          isActive: true,
-          attributes: {},
-          customAttributesJson: "",
-        },
       },
     ]);
     setErrors({ byLine: {} });
     setFormError(null);
     setSaving(false);
   }, [open]);
-
-  const sortedCategories = useMemo(() => {
-    const out = categories.items.slice();
-    out.sort((a, b) => a.name.localeCompare(b.name));
-    return out;
-  }, [categories.items]);
 
   const pending = saving || muts.submitting;
 
@@ -178,14 +143,6 @@ export function CreatePurchaseOrderDialog({ open, onOpenChange }: { open: boolea
         productId: null,
         quantityOrdered: "1",
         agreedUnitCost: "0",
-        newProduct: {
-          code: "",
-          name: "",
-          categoryId: "",
-          isActive: true,
-          attributes: {},
-          customAttributesJson: "",
-        },
       },
     ]);
   }
@@ -241,22 +198,7 @@ export function CreatePurchaseOrderDialog({ open, onOpenChange }: { open: boolea
         const pid = ln.productId?.trim() ? ln.productId.trim() : null;
         if (!pid) le.productId = t("create.validation.productRequired");
       } else {
-        const code = ln.newProduct.code.trim();
-        const name = ln.newProduct.name.trim();
-        if (!code) le.newCode = t("create.validation.newCodeRequired");
-        if (!name) le.newName = t("create.validation.newNameRequired");
-
-        const json = ln.newProduct.customAttributesJson.trim();
-        if (json) {
-          try {
-            const parsed = JSON.parse(json) as unknown;
-            if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
-              le.customAttributesJson = t("create.validation.customAttributesInvalid");
-            }
-          } catch {
-            le.customAttributesJson = t("create.validation.customAttributesInvalid");
-          }
-        }
+        le.newProduct = t("create.validation.newProductRequired");
       }
 
       if (Object.keys(le).length) next.byLine[ln.key] = le;
@@ -282,39 +224,17 @@ export function CreatePurchaseOrderDialog({ open, onOpenChange }: { open: boolea
 
     const items: PurchaseOrderCreateItem[] = [];
 
-    for (const ln of lines) {
-      const qty = coerceInt(ln.quantityOrdered) ?? 0;
-      const cost = coerceNumber(ln.agreedUnitCost) ?? 0;
+     for (const ln of lines) {
+       const qty = coerceInt(ln.quantityOrdered) ?? 0;
+       const cost = coerceNumber(ln.agreedUnitCost) ?? 0;
 
-      if (ln.mode === "existing") {
-        items.push({
-          productId: ln.productId!.trim(),
-          quantityOrdered: qty,
-          agreedUnitCost: cost,
-        });
-      } else {
-        let mergedAttrs: Record<string, unknown> = { ...ln.newProduct.attributes };
-        const json = ln.newProduct.customAttributesJson.trim();
-        if (json) {
-          const parsed = JSON.parse(json) as Record<string, unknown>;
-          mergedAttrs = { ...mergedAttrs, ...parsed };
-        }
-
-        const newProduct: PurchaseOrderNewProduct = {
-          code: ln.newProduct.code.trim(),
-          name: ln.newProduct.name.trim(),
-          isActive: ln.newProduct.isActive,
-          categoryId: ln.newProduct.categoryId.trim() ? ln.newProduct.categoryId.trim() : undefined,
-          attributes: Object.keys(mergedAttrs).length ? mergedAttrs : undefined,
-        };
-
-        items.push({
-          newProduct,
-          quantityOrdered: qty,
-          agreedUnitCost: cost,
-        });
-      }
-    }
+       if (ln.mode !== "existing") continue;
+       items.push({
+         productId: ln.productId!.trim(),
+         quantityOrdered: qty,
+         agreedUnitCost: cost,
+       });
+     }
 
     const dto: PurchaseOrderCreateDto = {
       branchId: cleanBranchId,
@@ -346,7 +266,10 @@ export function CreatePurchaseOrderDialog({ open, onOpenChange }: { open: boolea
   }
 
   const lineCount = lines.length;
-  const canSubmit = Boolean(supplierId && branchId && lineCount > 0) && !pending;
+  const canSubmit =
+    Boolean(supplierId && branchId && lineCount > 0) &&
+    lines.every((ln) => ln.mode === "existing") &&
+    !pending;
 
   return (
     <Dialog
@@ -456,9 +379,6 @@ export function CreatePurchaseOrderDialog({ open, onOpenChange }: { open: boolea
                         line={ln}
                         error={errors.byLine[ln.key] ?? {}}
                         pending={pending}
-                        categories={sortedCategories}
-                        categoriesLoading={categories.loading}
-                        categoriesError={categories.error}
                         onChange={(updater) => setLine(ln.key, updater)}
                         onRemove={() => removeLine(ln.key)}
                         onFixError={(patch) => setLineError(ln.key, patch)}
@@ -497,9 +417,6 @@ function LineEditor({
   line,
   error,
   pending,
-  categories,
-  categoriesLoading,
-  categoriesError,
   onChange,
   onRemove,
   onFixError,
@@ -508,47 +425,15 @@ function LineEditor({
   line: LineDraft;
   error: LineErrors;
   pending: boolean;
-  categories: Category[];
-  categoriesLoading: boolean;
-  categoriesError: string | null;
   onChange: (updater: (prev: LineDraft) => LineDraft) => void;
   onRemove: () => void;
   onFixError: (patch: LineErrors) => void;
 }) {
   const t = useTranslations("PurchaseOrders");
-  const tc = useTranslations("Common");
-  const tp = useTranslations("Products");
 
   const lineTitle = t("create.lines.lineTitle", { index: index + 1 });
 
-  const attributeDefinitions = useAttributeDefinitions(line.mode === "new" ? (line.newProduct.categoryId.trim() || null) : null);
-
-  function setAttr(key: string, value: unknown) {
-    onChange((prev) => ({
-      ...prev,
-      newProduct: {
-        ...prev.newProduct,
-        attributes: {
-          ...prev.newProduct.attributes,
-          [key]: value,
-        },
-      },
-    }));
-  }
-
-  function clearAttr(key: string) {
-    onChange((prev) => {
-      const nextAttrs = { ...prev.newProduct.attributes };
-      delete nextAttrs[key];
-      return {
-        ...prev,
-        newProduct: {
-          ...prev.newProduct,
-          attributes: nextAttrs,
-        },
-      };
-    });
-  }
+  const [productFormOpen, setProductFormOpen] = useState(false);
 
   const modeLabel = line.mode === "existing" ? t("create.lines.modeExisting") : t("create.lines.modeNew");
 
@@ -576,12 +461,14 @@ function LineEditor({
               value={line.mode}
               onValueChange={(next) => {
                 if (!isModeValue(next)) return;
-                onFixError({ productId: undefined, newCode: undefined, newName: undefined });
+                onFixError({ productId: undefined, newProduct: undefined });
                 onChange((prev) => ({
                   ...prev,
                   mode: next,
                   productId: next === "existing" ? prev.productId : null,
                 }));
+
+                if (next === "new") setProductFormOpen(true);
               }}
             >
               <SelectTrigger id={`po-line-${line.key}-mode`} className="w-full">
@@ -607,8 +494,27 @@ function LineEditor({
                 {error.productId ? <p className="text-xs text-destructive">{error.productId}</p> : null}
               </>
             ) : (
-              <div className="rounded-md border border-dashed border-border bg-muted/10 p-3 text-sm text-muted-foreground">
-                {t("create.lines.newProductHint")}
+              <div className="space-y-2">
+                <div className="rounded-md border border-dashed border-border bg-muted/10 p-3">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="text-sm text-muted-foreground">{t("create.lines.newProductHint")}</div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setProductFormOpen(true)}
+                      disabled={pending}
+                    >
+                      <Plus className="h-4 w-4" />
+                      {t("create.lines.actions.createProduct")}
+                    </Button>
+                  </div>
+                </div>
+                {error.newProduct ? (
+                  <p className="text-xs text-destructive" role="alert">
+                    {error.newProduct}
+                  </p>
+                ) : null}
               </div>
             )}
           </div>
@@ -643,311 +549,23 @@ function LineEditor({
           </div>
         </div>
 
-        {line.mode === "new" ? (
-          <>
-            <Separator />
-
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
-              <div className="md:col-span-3 space-y-2">
-                <Label htmlFor={`po-line-${line.key}-new-code`}>{tp("fields.code")}</Label>
-                <Input
-                  id={`po-line-${line.key}-new-code`}
-                  value={line.newProduct.code}
-                  onChange={(e) => onChange((prev) => ({ ...prev, newProduct: { ...prev.newProduct, code: e.target.value } }))}
-                  aria-invalid={Boolean(error.newCode)}
-                />
-                {error.newCode ? <p className="text-xs text-destructive">{error.newCode}</p> : null}
-              </div>
-              <div className="md:col-span-5 space-y-2">
-                <Label htmlFor={`po-line-${line.key}-new-name`}>{tp("fields.name")}</Label>
-                <Input
-                  id={`po-line-${line.key}-new-name`}
-                  value={line.newProduct.name}
-                  onChange={(e) => onChange((prev) => ({ ...prev, newProduct: { ...prev.newProduct, name: e.target.value } }))}
-                  aria-invalid={Boolean(error.newName)}
-                />
-                {error.newName ? <p className="text-xs text-destructive">{error.newName}</p> : null}
-              </div>
-              <div className="md:col-span-4 space-y-2">
-                <Label htmlFor={`po-line-${line.key}-new-category`}>{tp("fields.category")}</Label>
-                {categoriesLoading ? (
-                  <Skeleton className="h-9 w-full" />
-                ) : categoriesError ? (
-                  <Alert variant="destructive" className="border-destructive/30 bg-destructive/10">
-                    <AlertDescription>{categoriesError}</AlertDescription>
-                  </Alert>
-                ) : (
-                  <Select
-                    value={line.newProduct.categoryId.trim() ? line.newProduct.categoryId : UNSET_SELECT_VALUE}
-                    onValueChange={(next) => {
-                      const nextId = next === UNSET_SELECT_VALUE ? "" : next;
-                      onChange((prev) => ({
-                        ...prev,
-                        newProduct: { ...prev.newProduct, categoryId: nextId, attributes: {} },
-                      }));
-                    }}
-                  >
-                    <SelectTrigger id={`po-line-${line.key}-new-category`} className="w-full">
-                      <SelectValue placeholder={tp("form.categorySelectPlaceholder")} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value={UNSET_SELECT_VALUE}>{tc("labels.none")}</SelectItem>
-                      {categories.map((c) => (
-                        <SelectItem key={c.id} value={c.id}>
-                          {c.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-3 rounded-md border border-border p-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="space-y-0.5">
-                <div className="text-sm font-medium">{tp("fields.isActive")}</div>
-                <div className="text-xs text-muted-foreground">{t("create.lines.newProductActiveHint")}</div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Switch
-                  id={`po-line-${line.key}-new-active`}
-                  checked={line.newProduct.isActive}
-                  onCheckedChange={(checked) => onChange((prev) => ({ ...prev, newProduct: { ...prev.newProduct, isActive: checked } }))}
-                  disabled={pending}
-                />
-                <Label htmlFor={`po-line-${line.key}-new-active`} className="text-sm">
-                  {line.newProduct.isActive ? tc("labels.active") : tc("labels.inactive")}
-                </Label>
-              </div>
-            </div>
-
-            {line.newProduct.categoryId.trim() ? (
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="text-sm font-semibold">{tp("fields.attributes")}</div>
-                  {attributeDefinitions.loading ? (
-                    <div className="text-xs text-muted-foreground">{tc("actions.loading")}</div>
-                  ) : null}
-                </div>
-
-                {attributeDefinitions.error ? (
-                  <Alert variant="destructive" className="border-destructive/30 bg-destructive/10">
-                    <AlertDescription>{attributeDefinitions.error}</AlertDescription>
-                  </Alert>
-                ) : null}
-
-                {!attributeDefinitions.loading && attributeDefinitions.items.length === 0 ? (
-                  <div className="rounded-md border border-dashed border-border bg-muted/10 p-3 text-sm text-muted-foreground">
-                    {t("create.lines.noAttributes")}
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
-                    {attributeDefinitions.items
-                      .slice()
-                      .sort((a, b) => a.sortOrder - b.sortOrder)
-                      .map((def) => (
-                        <AttributeField
-                          key={def.id}
-                          definition={def}
-                          idPrefix={`po-line-${line.key}`}
-                          value={line.newProduct.attributes[def.key]}
-                          onChange={(v) => setAttr(def.key, v)}
-                          onClear={() => clearAttr(def.key)}
-                          disabled={pending}
-                        />
-                      ))}
-                  </div>
-                )}
-              </div>
-            ) : null}
-
-            <div className="space-y-2">
-              <Label htmlFor={`po-line-${line.key}-custom-attrs`}>{t("create.lines.fields.customAttributes")}</Label>
-              <Textarea
-                id={`po-line-${line.key}-custom-attrs`}
-                value={line.newProduct.customAttributesJson}
-                onChange={(e) => onChange((prev) => ({ ...prev, newProduct: { ...prev.newProduct, customAttributesJson: e.target.value } }))}
-                placeholder={t("create.lines.placeholders.customAttributes")}
-                className="min-h-[96px] font-mono text-xs"
-                aria-invalid={Boolean(error.customAttributesJson)}
-              />
-              {error.customAttributesJson ? (
-                <p className="text-xs text-destructive">{error.customAttributesJson}</p>
-              ) : (
-                <p className="text-xs text-muted-foreground">{t("create.lines.hints.customAttributes")}</p>
-              )}
-            </div>
-          </>
-        ) : null}
+        <ProductForm
+          open={productFormOpen}
+          onOpenChange={setProductFormOpen}
+          mode="create"
+          product={null}
+          onSaved={() => undefined}
+          showInitialStockStep={false}
+          onCreated={(created) => {
+            onFixError({ newProduct: undefined });
+            onChange((prev) => ({
+              ...prev,
+              mode: "existing",
+              productId: created.id,
+            }));
+          }}
+        />
       </CardContent>
     </Card>
-  );
-}
-
-function AttributeField({
-  definition,
-  idPrefix,
-  value,
-  onChange,
-  onClear,
-  disabled,
-}: {
-  definition: ProductAttributeDefinition;
-  idPrefix: string;
-  value: unknown;
-  onChange: (value: unknown) => void;
-  onClear: () => void;
-  disabled: boolean;
-}) {
-  const t = useTranslations("PurchaseOrders");
-
-  const id = `${idPrefix}_attr_${definition.id}`;
-  const required = definition.isRequired;
-  const label = definition.label;
-
-  const helper = required ? t("create.lines.attributes.required") : t("create.lines.attributes.optional");
-
-  const containerClass = "md:col-span-6";
-
-  if (definition.type === "BOOLEAN") {
-    const checked = typeof value === "boolean" ? value : false;
-    const hasValue = typeof value === "boolean";
-    return (
-      <div className={cn(containerClass, "space-y-2")}
-      >
-        <div className="flex items-center justify-between gap-3">
-          <Label htmlFor={id}>{label}</Label>
-          <Button type="button" variant="ghost" size="xs" disabled={disabled || !hasValue} onClick={onClear}>
-            {t("create.actions.clear")}
-          </Button>
-        </div>
-        <div className="flex items-center justify-between rounded-md border border-border p-3">
-          <div className="text-xs text-muted-foreground">{helper}</div>
-          <Switch id={id} checked={checked} onCheckedChange={(v) => onChange(v)} disabled={disabled} />
-        </div>
-      </div>
-    );
-  }
-
-  if (definition.type === "ENUM") {
-    const v = typeof value === "string" ? value : "";
-    const opts = definition.options ?? [];
-    return (
-      <div className={cn(containerClass, "space-y-2")}
-      >
-        <div className="flex items-center justify-between gap-3">
-          <Label htmlFor={id}>{label}</Label>
-          <Button type="button" variant="ghost" size="xs" disabled={disabled || !v} onClick={onClear}>
-            {t("create.actions.clear")}
-          </Button>
-        </div>
-        <Select
-          value={v ? v : UNSET_SELECT_VALUE}
-          onValueChange={(next) => {
-            if (next === UNSET_SELECT_VALUE) onClear();
-            else onChange(next);
-          }}
-          disabled={disabled}
-        >
-          <SelectTrigger id={id} className="w-full">
-            <SelectValue placeholder={t("create.lines.attributes.pickOne")} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={UNSET_SELECT_VALUE}>{t("create.lines.attributes.unset")}</SelectItem>
-            {opts.map((opt) => (
-              <SelectItem key={opt} value={opt}>
-                {opt}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <p className="text-xs text-muted-foreground">{helper}</p>
-      </div>
-    );
-  }
-
-  if (definition.type === "NUMBER") {
-    const v = typeof value === "number" ? String(value) : typeof value === "string" ? value : "";
-    return (
-      <div className={cn(containerClass, "space-y-2")}
-      >
-        <div className="flex items-center justify-between gap-3">
-          <Label htmlFor={id}>{label}</Label>
-          <Button type="button" variant="ghost" size="xs" disabled={disabled || !v} onClick={onClear}>
-            {t("create.actions.clear")}
-          </Button>
-        </div>
-        <Input
-          id={id}
-          type="number"
-          inputMode="decimal"
-          value={v}
-          onChange={(e) => {
-            const raw = e.target.value;
-            if (!raw.trim()) {
-              onClear();
-              return;
-            }
-            const n = Number(raw);
-            if (!Number.isFinite(n)) return;
-            onChange(n);
-          }}
-          disabled={disabled}
-        />
-        <p className="text-xs text-muted-foreground">{helper}</p>
-      </div>
-    );
-  }
-
-  if (definition.type === "DATE") {
-    const v = typeof value === "string" ? value : "";
-    return (
-      <div className={cn(containerClass, "space-y-2")}
-      >
-        <div className="flex items-center justify-between gap-3">
-          <Label htmlFor={id}>{label}</Label>
-          <Button type="button" variant="ghost" size="xs" disabled={disabled || !v} onClick={onClear}>
-            {t("create.actions.clear")}
-          </Button>
-        </div>
-        <Input
-          id={id}
-          type="date"
-          value={v}
-          onChange={(e) => {
-            const next = e.target.value;
-            if (!next.trim()) onClear();
-            else onChange(next);
-          }}
-          disabled={disabled}
-        />
-        <p className="text-xs text-muted-foreground">{helper}</p>
-      </div>
-    );
-  }
-
-  // TEXT and fallback
-  const v = typeof value === "string" ? value : value === undefined ? "" : String(value);
-  return (
-    <div className={cn(containerClass, "space-y-2")}
-    >
-      <div className="flex items-center justify-between gap-3">
-        <Label htmlFor={id}>{label}</Label>
-        <Button type="button" variant="ghost" size="xs" disabled={disabled || !v} onClick={onClear}>
-          {t("create.actions.clear")}
-        </Button>
-      </div>
-      <Input
-        id={id}
-        value={v}
-        onChange={(e) => {
-          const next = e.target.value;
-          if (!next.trim()) onClear();
-          else onChange(next);
-        }}
-        disabled={disabled}
-      />
-      <p className="text-xs text-muted-foreground">{helper}</p>
-    </div>
   );
 }

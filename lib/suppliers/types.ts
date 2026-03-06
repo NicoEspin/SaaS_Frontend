@@ -8,7 +8,7 @@ export const supplierSchema = z
     phone: z.string().nullable(),
     address: z.string().nullable(),
     taxId: z.string().nullable(),
-    paymentTerms: z.string(),
+    paymentTerms: z.string().nullable(),
     notes: z.string().nullable(),
     isActive: z.boolean(),
     createdAt: z.string().min(1),
@@ -33,6 +33,59 @@ export const suppliersListQuerySchema = z.object({
 });
 
 export type SuppliersListQuery = z.infer<typeof suppliersListQuerySchema>;
+
+const supplierBranchRefSchema = z
+  .object({
+    id: z.string().min(1),
+    name: z.string().min(1),
+  })
+  .passthrough();
+
+export const supplierActivePurchaseOrderSchema = z
+  .object({
+    id: z.string().min(1),
+    number: z.string().min(1),
+    status: z.string().min(1),
+    expectedAt: z.string().nullable(),
+    branch: supplierBranchRefSchema,
+    createdAt: z.string().min(1),
+    updatedAt: z.string().min(1),
+  })
+  .passthrough();
+
+export type SupplierActivePurchaseOrder = z.infer<typeof supplierActivePurchaseOrderSchema>;
+
+export const supplierWithActivePurchaseOrdersSchema = supplierSchema
+  .extend({
+    hasActivePurchaseOrders: z.boolean(),
+    activePurchaseOrders: z.array(supplierActivePurchaseOrderSchema),
+  })
+  .passthrough();
+
+export type SupplierWithActivePurchaseOrders = z.infer<typeof supplierWithActivePurchaseOrdersSchema>;
+
+export const suppliersWithActivePurchaseOrdersListResponseSchema = z.object({
+  items: z.array(supplierWithActivePurchaseOrdersSchema),
+  nextCursor: z.string().nullable(),
+});
+
+export type SuppliersWithActivePurchaseOrdersListResponse = z.infer<
+  typeof suppliersWithActivePurchaseOrdersListResponseSchema
+>;
+
+export const suppliersWithActivePurchaseOrdersListQuerySchema = z.object({
+  limit: z.number().int().positive().optional(),
+  cursor: z.string().min(1).optional(),
+  isActive: z.boolean().optional(),
+  q: z.string().optional(),
+  branchId: z.string().min(1).optional(),
+  maxOrders: z.number().int().min(1).max(20).optional(),
+  onlyWithActive: z.boolean().optional(),
+});
+
+export type SuppliersWithActivePurchaseOrdersListQuery = z.infer<
+  typeof suppliersWithActivePurchaseOrdersListQuerySchema
+>;
 
 export const supplierCreateDtoSchema = z.object({
   name: z.string().min(1),

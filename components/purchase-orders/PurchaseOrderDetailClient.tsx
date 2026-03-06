@@ -69,6 +69,12 @@ function formatMoney(value: number) {
   }).format(value);
 }
 
+function lineTotal(item: PurchaseOrderItem) {
+  const qty = Number.isFinite(item.quantityOrdered) ? item.quantityOrdered : 0;
+  const cost = Number.isFinite(item.agreedUnitCost) ? item.agreedUnitCost : 0;
+  return qty * cost;
+}
+
 function pendingQty(item: PurchaseOrderItem) {
   const ordered = Number.isFinite(item.quantityOrdered) ? item.quantityOrdered : 0;
   const received = Number.isFinite(item.receivedQty) ? item.receivedQty : 0;
@@ -119,6 +125,11 @@ export function PurchaseOrderDetailClient({ purchaseOrderId }: { purchaseOrderId
   const pendingTotal = useMemo(() => {
     if (!purchaseOrder) return 0;
     return purchaseOrder.items.reduce((sum, it) => sum + pendingQty(it), 0);
+  }, [purchaseOrder]);
+
+  const orderTotal = useMemo(() => {
+    if (!purchaseOrder) return 0;
+    return purchaseOrder.items.reduce((sum, it) => sum + lineTotal(it), 0);
   }, [purchaseOrder]);
 
   const canCreateReceipt = Boolean(
@@ -311,41 +322,55 @@ export function PurchaseOrderDetailClient({ purchaseOrderId }: { purchaseOrderId
                     <TableHead className="text-right">{t("detail.lines.columns.receivedQty")}</TableHead>
                     <TableHead className="text-right">{t("detail.lines.columns.pendingQty")}</TableHead>
                     <TableHead className="text-right">{t("detail.lines.columns.agreedUnitCost")}</TableHead>
+                    <TableHead className="text-right">{t("detail.lines.columns.lineTotal")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {purchaseOrder.items.length === 0 ? (
                     <TableRow className="hover:bg-transparent">
-                      <TableCell colSpan={5} className="h-40">
+                      <TableCell colSpan={6} className="h-40">
                         <EmptyState title={t("detail.lines.emptyTitle")} description={t("detail.lines.emptyDescription")} />
                       </TableCell>
                     </TableRow>
                   ) : (
-                    purchaseOrder.items.map((it) => {
-                      const pending = pendingQty(it);
-                      const code = it.productCodeSnapshot ?? null;
-                      const name = it.productNameSnapshot ?? null;
-                      const label = code && name ? `${code} - ${name}` : name ?? code ?? it.productId ?? it.id;
+                    <>
+                      {purchaseOrder.items.map((it) => {
+                        const pending = pendingQty(it);
+                        const code = it.productCodeSnapshot ?? null;
+                        const name = it.productNameSnapshot ?? null;
+                        const label = code && name ? `${code} - ${name}` : name ?? code ?? it.productId ?? it.id;
+                        const total = lineTotal(it);
 
-                      return (
-                        <TableRow key={it.id} className="hover:bg-muted/50 transition-colors">
-                          <TableCell>
-                            <div className="min-w-0">
-                              <div className="truncate text-sm font-medium">{label}</div>
-                              <div className="truncate font-mono text-xs text-muted-foreground">{it.id}</div>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-right tabular-nums">{it.quantityOrdered}</TableCell>
-                          <TableCell className="text-right tabular-nums">{it.receivedQty}</TableCell>
-                          <TableCell className="text-right">
-                            <Badge variant="outline" className={cn("tabular-nums", pendingBadgeClassName(pending))}>
-                              {pending}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-right tabular-nums">{formatMoney(it.agreedUnitCost)}</TableCell>
-                        </TableRow>
-                      );
-                    })
+                        return (
+                          <TableRow key={it.id} className="hover:bg-muted/50 transition-colors">
+                            <TableCell>
+                              <div className="min-w-0">
+                                <div className="truncate text-sm font-medium">{label}</div>
+                                <div className="truncate font-mono text-xs text-muted-foreground">{it.id}</div>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-right tabular-nums">{it.quantityOrdered}</TableCell>
+                            <TableCell className="text-right tabular-nums">{it.receivedQty}</TableCell>
+                            <TableCell className="text-right">
+                              <Badge variant="outline" className={cn("tabular-nums", pendingBadgeClassName(pending))}>
+                                {pending}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-right tabular-nums">{formatMoney(it.agreedUnitCost)}</TableCell>
+                            <TableCell className="text-right tabular-nums">{formatMoney(total)}</TableCell>
+                          </TableRow>
+                        );
+                      })}
+
+                      <TableRow className="hover:bg-transparent">
+                        <TableCell colSpan={5} className="text-right text-sm font-medium">
+                          {t("detail.lines.totalLabel")}
+                        </TableCell>
+                        <TableCell className="text-right text-sm font-medium tabular-nums">
+                          {formatMoney(orderTotal)}
+                        </TableCell>
+                      </TableRow>
+                    </>
                   )}
                 </TableBody>
               </Table>

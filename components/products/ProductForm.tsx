@@ -87,6 +87,8 @@ type Props = {
   mode: Mode;
   product: Product | null;
   onSaved: () => void;
+  showInitialStockStep?: boolean;
+  onCreated?: (product: Product) => void;
 };
 
 type FieldErrors = Record<string, string>;
@@ -103,12 +105,24 @@ function coerceInitialAttrValue(v: ProductAttributeValue | undefined) {
   return v;
 }
 
-export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Props) {
+export function ProductForm({
+  open,
+  onOpenChange,
+  mode,
+  product,
+  onSaved,
+  showInitialStockStep = true,
+  onCreated,
+}: Props) {
   const t = useTranslations("Products");
   const tc = useTranslations("Common");
   const ta = useTranslations("Attributes");
 
   const { submitting, createProduct, updateProduct } = useProductMutations();
+
+  const isCreateWizard = mode === "create";
+  const hasStockStep = isCreateWizard && showInitialStockStep;
+  const lastWizardTab: FormTab = hasStockStep ? "stock" : "attributes";
 
   const initial = useMemo(() => {
     if (mode === "edit" && product) {
@@ -149,10 +163,10 @@ export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Prop
   const hydrateSession = useAuthStore((s) => s.hydrateSession);
 
   useEffect(() => {
-    if (!open || mode !== "create") return;
+    if (!open || mode !== "create" || !hasStockStep) return;
     if (session || sessionLoading) return;
     void hydrateSession();
-  }, [hydrateSession, mode, open, session, sessionLoading]);
+  }, [hasStockStep, hydrateSession, mode, open, session, sessionLoading]);
 
   const branches = useMemo(
     () => ({
@@ -224,8 +238,6 @@ export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Prop
     mode === "create" ? 0 : 1
   );
 
-  const isCreateWizard = mode === "create";
-
   function tabIndex(tab: FormTab) {
     if (tab === "details") return 0;
     if (tab === "attributes") return 1;
@@ -287,6 +299,7 @@ export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Prop
       return;
     }
     if (activeTab === "attributes") {
+      if (!hasStockStep) return;
       if (defsLoading) return;
       if (!validateAttributesStep()) return;
       setMaxUnlockedTabIndex((v) => Math.max(v, 2));
@@ -339,7 +352,7 @@ export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Prop
   }
 
   function buildInitialStockPayload(): ProductCreateDto["initialStock"] {
-    if (mode !== "create") return undefined;
+    if (mode !== "create" || !hasStockStep) return undefined;
 
     const deduped = new Map<string, { branchId: string; stockOnHand: number; price: number }>();
 
@@ -369,7 +382,7 @@ export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Prop
       if (missing) next[`attr.${def.key}`] = t("validation.attributeRequired");
     }
 
-    if (mode === "create") {
+    if (mode === "create" && hasStockStep) {
       let invalidCount = 0;
       for (const row of initialStockRows) {
         const hasAny = Boolean(
@@ -397,7 +410,10 @@ export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Prop
     if (Object.keys(next).length) {
       if (next.code || next.name) setActiveTab("details");
       else if (Object.keys(next).some((k) => k.startsWith("attr."))) setActiveTab("attributes");
-      else if (next.initialStock || Object.keys(next).some((k) => k.startsWith("stock."))) {
+      else if (
+        hasStockStep &&
+        (next.initialStock || Object.keys(next).some((k) => k.startsWith("stock.")))
+      ) {
         setActiveTab("stock");
       }
       return false;
@@ -410,7 +426,7 @@ export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Prop
     e.preventDefault();
     setFormError(null);
 
-    if (mode === "create" && activeTab !== "stock") {
+    if (mode === "create" && activeTab !== lastWizardTab) {
       await goNext();
       return;
     }
@@ -446,7 +462,8 @@ export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Prop
           ...base,
           initialStock,
         };
-        await createProduct(createPayload);
+        const created = await createProduct(createPayload);
+        onCreated?.(created);
         toast.success(t("success.created"));
       }
       onOpenChange(false);
@@ -505,7 +522,7 @@ export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Prop
                     {t("form.tabs.attributes")}
                   </TabsTrigger>
                 ) : null}
-                {isCreateWizard && maxUnlockedTabIndex >= 2 ? (
+                {hasStockStep && maxUnlockedTabIndex >= 2 ? (
                   <TabsTrigger
                     value="stock"
                     className="after:bg-primary data-[state=active]:text-primary dark:data-[state=active]:text-primary"
@@ -820,7 +837,7 @@ export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Prop
                 </Card>
               </TabsContent>
 
-              {mode === "create" ? (
+              {hasStockStep ? (
                 <TabsContent value="stock" className="space-y-6">
                   <Card>
                     <CardHeader className="border-b">
@@ -1034,7 +1051,7 @@ export function ProductForm({ open, onOpenChange, mode, product, onSaved }: Prop
                   {tc("actions.cancel")}
                 </Button>
 
-                {mode === "create" && activeTab !== "stock" ? (
+                {mode === "create" && activeTab !== lastWizardTab ? (
                   <Button
                     type="button"
                     disabled={submitting || (activeTab === "attributes" && defsLoading)}

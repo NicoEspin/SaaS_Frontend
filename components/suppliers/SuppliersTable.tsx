@@ -1,11 +1,12 @@
 "use client";
 
-import { MoreHorizontal, Pencil } from "lucide-react";
+import { ExternalLink, MoreHorizontal, Pencil } from "lucide-react";
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 
 import { EmptyState } from "@/components/empty-state/EmptyState";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -24,7 +25,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import type { Supplier } from "@/lib/suppliers/types";
+import { PurchaseOrderStatusBadge } from "@/components/purchase-orders/PurchaseOrderStatusBadge";
+import { Link } from "@/i18n/navigation";
+import { purchaseOrderStatusSchema, type PurchaseOrderStatus } from "@/lib/purchase-orders/types";
+import type { SupplierWithActivePurchaseOrders } from "@/lib/suppliers/types";
 import { cn } from "@/lib/utils";
 import { SupplierStatusBadge } from "@/components/suppliers/SupplierStatusBadge";
 
@@ -41,10 +45,10 @@ function formatDate(value: string) {
 }
 
 type Props = {
-  items: Supplier[];
+  items: SupplierWithActivePurchaseOrders[];
   loading: boolean;
   error: string | null;
-  onEdit: (supplier: Supplier) => void;
+  onEdit: (supplier: SupplierWithActivePurchaseOrders) => void;
   hasFilters?: boolean;
   onClearFilters?: () => void;
   onCreate?: () => void;
@@ -61,6 +65,7 @@ export function SuppliersTable({
 }: Props) {
   const t = useTranslations("Suppliers");
   const tc = useTranslations("Common");
+  const tpo = useTranslations("PurchaseOrders");
 
   const labels = useMemo(() => ({ none: tc("labels.none") }), [tc]);
 
@@ -120,7 +125,77 @@ export function SuppliersTable({
 
               {items.map((s) => (
                 <TableRow key={s.id} className="hover:bg-muted/50 transition-colors">
-                  <TableCell className="font-medium">{s.name}</TableCell>
+                  <TableCell className="align-top">
+                    <div className="space-y-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-medium">{s.name}</span>
+                        {s.hasActivePurchaseOrders ? (
+                          <Badge
+                            variant="outline"
+                            className="bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-800"
+                          >
+                            {t("activePurchaseOrders.badge", { count: s.activePurchaseOrders.length })}
+                          </Badge>
+                        ) : null}
+                      </div>
+
+                      {s.hasActivePurchaseOrders ? (
+                        <div className="flex flex-wrap items-center gap-2">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                asChild
+                                variant="outline"
+                                size="xs"
+                                aria-label={t("activePurchaseOrders.viewAllAria", { name: s.name })}
+                              >
+                                <Link href={`/purchase-orders?supplierId=${encodeURIComponent(s.id)}`}>
+                                  <ExternalLink className="h-3 w-3" />
+                                  {t("activePurchaseOrders.viewAll")}
+                                </Link>
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="top">{t("activePurchaseOrders.viewAll")}</TooltipContent>
+                          </Tooltip>
+
+                          <div className="flex flex-wrap items-center gap-2">
+                            {s.activePurchaseOrders.map((po) => {
+                              const known = purchaseOrderStatusSchema.safeParse(po.status).success;
+                              const statusBadge = known ? (
+                                <PurchaseOrderStatusBadge status={po.status as PurchaseOrderStatus} />
+                              ) : (
+                                <Badge variant="outline" className="font-medium">
+                                  {po.status}
+                                </Badge>
+                              );
+
+                              return (
+                                <div key={po.id} className="flex flex-wrap items-center gap-1">
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        asChild
+                                        variant="outline"
+                                        size="xs"
+                                        className="font-mono"
+                                        aria-label={t("activePurchaseOrders.openOrderAria", { number: po.number })}
+                                      >
+                                        <Link href={`/purchase-orders/${po.id}`}>{po.number}</Link>
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="top">{tpo("actions.open")}</TooltipContent>
+                                  </Tooltip>
+
+                                  {statusBadge}
+                                  <span className="text-xs text-muted-foreground">{po.branch.name}</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ) : null}
+                    </div>
+                  </TableCell>
                   <TableCell className={cn("text-sm", !s.email && "text-muted-foreground")}>
                     {s.email ?? labels.none}
                   </TableCell>

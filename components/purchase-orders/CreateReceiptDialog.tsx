@@ -10,6 +10,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -136,6 +137,12 @@ export function CreateReceiptDialog({
     return out;
   }, [orderItems]);
 
+  const lineDraftByItemId = useMemo(() => {
+    const out: Record<string, LineDraft> = {};
+    for (const ln of lines) out[ln.purchaseOrderItemId] = ln;
+    return out;
+  }, [lines]);
+
   const totalPending = useMemo(() => orderItems.reduce((sum, it) => sum + pendingQty(it), 0), [orderItems]);
 
   function setLine(id: string, patch: Partial<LineDraft>) {
@@ -176,6 +183,43 @@ export function CreateReceiptDialog({
   }, [lines]);
 
   const totalReceiving = useMemo(() => selectedItems.reduce((sum, it) => sum + it.qty, 0), [selectedItems]);
+
+  const receivableItemIds = useMemo(() => {
+    return orderItems
+      .filter((it) => (pendingByItemId[it.id] ?? 0) > 0)
+      .map((it) => it.id);
+  }, [orderItems, pendingByItemId]);
+
+  const selectAllChecked = useMemo(() => {
+    if (receivableItemIds.length === 0) return false;
+    return receivableItemIds.every((id) => {
+      const pendingQtyForLine = pendingByItemId[id] ?? 0;
+      const draft = lineDraftByItemId[id];
+      const qty = draft ? coerceNumber(draft.quantityReceived) : 0;
+      return pendingQtyForLine > 0 && qty !== null && qty === pendingQtyForLine;
+    });
+  }, [lineDraftByItemId, pendingByItemId, receivableItemIds]);
+
+  function toggleSelectAll(next: boolean) {
+    if (pending) return;
+    setLines((s) =>
+      s.map((ln) => {
+        const max = pendingByItemId[ln.purchaseOrderItemId] ?? 0;
+        if (max <= 0) return ln;
+        return {
+          ...ln,
+          quantityReceived: next ? String(max) : "0",
+        };
+      })
+    );
+  }
+
+  function toggleLineFull(itemId: string, next: boolean) {
+    if (pending) return;
+    const max = pendingByItemId[itemId] ?? 0;
+    if (max <= 0) return;
+    setLine(itemId, { quantityReceived: next ? String(max) : "0" });
+  }
 
   async function submit() {
     setFormError(null);
@@ -310,8 +354,24 @@ export function CreateReceiptDialog({
 
             <Card>
               <CardHeader className="border-b">
-                <CardTitle>{t("receipt.sections.linesTitle")}</CardTitle>
-                <CardDescription>{t("receipt.sections.linesSubtitle")}</CardDescription>
+                <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                  <div className="space-y-1">
+                    <CardTitle>{t("receipt.sections.linesTitle")}</CardTitle>
+                    <CardDescription>{t("receipt.sections.linesSubtitle")}</CardDescription>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id="po-receipt-select-all"
+                      checked={selectAllChecked}
+                      onCheckedChange={(v) => toggleSelectAll(v === true)}
+                      disabled={pending || receivableItemIds.length === 0}
+                      aria-label={t("receipt.aria.selectAll")}
+                    />
+                    <Label htmlFor="po-receipt-select-all" className={cn("text-sm font-medium", (pending || receivableItemIds.length === 0) && "text-muted-foreground")}>
+                      {t("receipt.labels.selectAll")}
+                    </Label>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="rounded-md border border-border">
@@ -327,20 +387,32 @@ export function CreateReceiptDialog({
                     <TableBody>
                       {orderItems.map((it) => {
                         const pendingQtyForLine = pendingByItemId[it.id] ?? 0;
-                        const draft = lines.find((ln) => ln.purchaseOrderItemId === it.id);
+                        const draft = lineDraftByItemId[it.id];
                         const lineErr = errorsByLine[it.id] ?? {};
 
                         if (!draft) return null;
 
                         const disabledLine = pending || pendingQtyForLine <= 0;
                         const label = lineLabel(it, it.id);
+                        const qty = coerceNumber(draft.quantityReceived) ?? 0;
+                        const lineChecked = pendingQtyForLine > 0 && qty === pendingQtyForLine;
 
                         return (
                           <TableRow key={it.id} className="hover:bg-muted/50 transition-colors">
                             <TableCell>
-                              <div className="min-w-0">
-                                <div className="truncate text-sm font-medium">{label}</div>
-                                <div className="truncate font-mono text-xs text-muted-foreground">{it.id}</div>
+                              <div className="flex min-w-0 items-start gap-3">
+                                <Checkbox
+                                  id={`po-receipt-line-${it.id}`}
+                                  checked={lineChecked}
+                                  onCheckedChange={(v) => toggleLineFull(it.id, v === true)}
+                                  disabled={disabledLine}
+                                  className="mt-0.5"
+                                  aria-label={t("receipt.aria.selectLine", { item: label })}
+                                />
+                                <div className="min-w-0">
+                                  <div className="truncate text-sm font-medium">{label}</div>
+                                  <div className="truncate font-mono text-xs text-muted-foreground">{it.id}</div>
+                                </div>
                               </div>
                             </TableCell>
                             <TableCell className="text-right">

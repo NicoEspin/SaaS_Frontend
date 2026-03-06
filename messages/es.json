@@ -207,6 +207,12 @@
       "noResults": "Sin resultados.",
       "clear": "Limpiar",
       "any": "Cualquier proveedor"
+    },
+    "activePurchaseOrders": {
+      "badge": "Pedidos activos: {count}",
+      "viewAll": "Ver ordenes de compra",
+      "viewAllAria": "Ver ordenes de compra de {name}",
+      "openOrderAria": "Abrir orden de compra {number}"
     }
   },
   "PurchaseOrders": {
@@ -255,12 +261,14 @@
       "lines": {
         "emptyTitle": "Sin lineas",
         "emptyDescription": "Esta orden de compra no tiene items.",
+        "totalLabel": "Total",
         "columns": {
           "product": "Item",
           "quantityOrdered": "Pedida",
           "receivedQty": "Recibida",
           "pendingQty": "Pendiente",
-          "agreedUnitCost": "Costo acordado"
+          "agreedUnitCost": "Costo acordado",
+          "lineTotal": "Total"
         }
       },
       "receipts": {
@@ -343,27 +351,15 @@
         "lineSubtitle": "Cantidad y costo por item.",
         "modeExisting": "Producto existente",
         "modeNew": "Producto nuevo",
-        "newProductHint": "Completa los datos del producto nuevo debajo.",
-        "newProductActiveHint": "Los productos nuevos quedan activos por defecto.",
-        "noAttributes": "No hay definiciones de atributos para esta categoria.",
+        "newProductHint": "Crea el producto con el mismo formulario de Productos. Al guardar, se selecciona automaticamente en esta linea.",
+        "actions": {
+          "createProduct": "Crear producto"
+        },
         "fields": {
           "mode": "Tipo",
           "product": "Producto",
           "quantityOrdered": "Cantidad",
-          "agreedUnitCost": "Costo unitario acordado",
-          "customAttributes": "Atributos custom (JSON)"
-        },
-        "placeholders": {
-          "customAttributes": "{\n  \"color\": \"rojo\"\n}"
-        },
-        "hints": {
-          "customAttributes": "Opcional. Debe ser un objeto JSON y se mezcla con los atributos de categoria."
-        },
-        "attributes": {
-          "required": "Obligatorio",
-          "optional": "Opcional",
-          "pickOne": "Elegir",
-          "unset": "Sin asignar"
+          "agreedUnitCost": "Costo unitario acordado"
         }
       },
       "validation": {
@@ -373,9 +369,7 @@
         "qtyRequired": "Ingresa una cantidad mayor a 0.",
         "costRequired": "Ingresa un costo valido.",
         "productRequired": "Selecciona un producto.",
-        "newCodeRequired": "El codigo es obligatorio.",
-        "newNameRequired": "El nombre es obligatorio.",
-        "customAttributesInvalid": "JSON invalido. Debe ser un objeto como { \"key\": \"value\" }."
+        "newProductRequired": "Crea el producto para continuar."
       },
       "errors": {
         "fixForm": "Corregi los campos marcados."
@@ -402,7 +396,12 @@
       },
       "labels": {
         "pendingQty": "{qty} pendientes",
-        "receivingQty": "{qty} recibiendo"
+        "receivingQty": "{qty} recibiendo",
+        "selectAll": "Seleccionar todo"
+      },
+      "aria": {
+        "selectAll": "Seleccionar todos los items",
+        "selectLine": "Seleccionar todo para {item}"
       },
       "hints": {
         "pending": "Solo podes recibir hasta la cantidad pendiente por item."

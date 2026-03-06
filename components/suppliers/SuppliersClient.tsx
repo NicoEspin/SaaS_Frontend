@@ -8,16 +8,20 @@ import { SupplierFilters, type SuppliersUiFilters } from "@/components/suppliers
 import { SupplierForm } from "@/components/suppliers/SupplierForm";
 import { SuppliersTable } from "@/components/suppliers/SuppliersTable";
 import { Button } from "@/components/ui/button";
-import type { SuppliersListQuery } from "@/lib/suppliers/types";
+import type {
+  SupplierWithActivePurchaseOrders,
+  SuppliersWithActivePurchaseOrdersListQuery,
+} from "@/lib/suppliers/types";
 import { useSuppliersList } from "@/lib/suppliers/hooks/use-suppliers-list";
-import type { Supplier } from "@/lib/suppliers/types";
 
 const EMPTY_UI_FILTERS: SuppliersUiFilters = {
   q: "",
   isActive: "all",
 };
 
-function uiToQueryFilters(ui: SuppliersUiFilters): Omit<SuppliersListQuery, "limit" | "cursor"> {
+function uiToQueryFilters(
+  ui: SuppliersUiFilters
+): Omit<SuppliersWithActivePurchaseOrdersListQuery, "limit" | "cursor"> {
   return {
     q: ui.q.trim() ? ui.q.trim() : undefined,
     isActive: ui.isActive === "active" ? true : ui.isActive === "inactive" ? false : undefined,
@@ -29,7 +33,9 @@ export function SuppliersClient() {
   const tc = useTranslations("Common");
 
   const [uiFilters, setUiFilters] = useState<SuppliersUiFilters>(EMPTY_UI_FILTERS);
-  const [appliedFilters, setAppliedFilters] = useState<Omit<SuppliersListQuery, "limit" | "cursor">>({});
+  const [appliedFilters, setAppliedFilters] = useState<
+    Omit<SuppliersWithActivePurchaseOrdersListQuery, "limit" | "cursor">
+  >({});
 
   const list = useSuppliersList({ limit: 10, initialFilters: appliedFilters });
 
@@ -57,7 +63,7 @@ export function SuppliersClient() {
     setFormOpen(true);
   }
 
-  function openEdit(supplier: Supplier) {
+  function openEdit(supplier: SupplierWithActivePurchaseOrders) {
     setFormMode("edit");
     setEditingId(supplier.id);
     setFormOpen(true);

@@ -2,8 +2,14 @@ import { getTranslations } from "next-intl/server";
 
 import { PurchaseOrdersClient } from "@/components/purchase-orders/PurchaseOrdersClient";
 
-export default async function PurchaseOrdersPage() {
+type Props = {
+  searchParams?: Record<string, string | string[] | undefined>;
+};
+
+export default async function PurchaseOrdersPage({ searchParams }: Props) {
   const t = await getTranslations("Pages");
+
+  const supplierId = typeof searchParams?.supplierId === "string" ? searchParams.supplierId : null;
 
   return (
     <section className="space-y-6">
@@ -12,7 +18,7 @@ export default async function PurchaseOrdersPage() {
         <p className="text-sm text-muted-foreground">{t("purchaseOrdersSubtitle")}</p>
       </div>
 
-      <PurchaseOrdersClient />
+      <PurchaseOrdersClient initialSupplierId={supplierId} />
     </section>
   );
 }

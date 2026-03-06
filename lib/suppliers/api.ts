@@ -3,11 +3,14 @@ import { omitEmpty } from "@/lib/products/utils";
 import {
   supplierSchema,
   suppliersListResponseSchema,
+  suppliersWithActivePurchaseOrdersListResponseSchema,
   type Supplier,
   type SupplierCreateDto,
   type SupplierUpdateDto,
   type SuppliersListQuery,
   type SuppliersListResponse,
+  type SuppliersWithActivePurchaseOrdersListQuery,
+  type SuppliersWithActivePurchaseOrdersListResponse,
 } from "@/lib/suppliers/types";
 
 function parseSupplier(value: unknown): Supplier {
@@ -19,6 +22,14 @@ function parseSupplier(value: unknown): Supplier {
 function parseSuppliersListResponse(value: unknown): SuppliersListResponse {
   const parsed = suppliersListResponseSchema.safeParse(value);
   if (!parsed.success) throw new Error("Invalid suppliers list response");
+  return parsed.data;
+}
+
+function parseSuppliersWithActivePurchaseOrdersListResponse(
+  value: unknown
+): SuppliersWithActivePurchaseOrdersListResponse {
+  const parsed = suppliersWithActivePurchaseOrdersListResponseSchema.safeParse(value);
+  if (!parsed.success) throw new Error("Invalid suppliers-with-active-purchase-orders list response");
   return parsed.data;
 }
 
@@ -35,6 +46,17 @@ export const suppliersApi = {
         signal: options?.signal,
       });
       return parseSuppliersListResponse(res.data);
+    },
+
+    async listWithActivePurchaseOrders(
+      query: SuppliersWithActivePurchaseOrdersListQuery,
+      options?: { signal?: AbortSignal }
+    ): Promise<SuppliersWithActivePurchaseOrdersListResponse> {
+      const res = await apiClient.get<unknown>("/suppliers/with-active-purchase-orders", {
+        params: omitEmpty(query),
+        signal: options?.signal,
+      });
+      return parseSuppliersWithActivePurchaseOrdersListResponse(res.data);
     },
 
     async get(id: string, options?: { signal?: AbortSignal }): Promise<Supplier> {
